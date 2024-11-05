@@ -1,10 +1,8 @@
-# TaskBuster
-The purpose of this app is for the user to be able to keep track of their tasks. The user can
-create multiple to do lists, as well as update or delete any existing ones made by the user.
-In addition, they are also able to give a due date for their tasks. 
+# React + Vite
 
-## FEATURES SUMMARY:
-+ User Authentication: Sign up and log in functionality.
-+ Task CRUD: Create, Read, Update, Delete tasks.
-+ Task Filtering: Filter tasks based on status (e.g., In Progress, Completed).
-+ Due Date Management: Assign due dates to tasks and sort based on deadlines.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+
+Currently, two official plugins are available:
+
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
