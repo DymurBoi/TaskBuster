@@ -1,10 +1,10 @@
 // src/components/ToDoLandingPage.jsx
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import './css.css';
 
-const ToDoLanding = ({ userId }) => {
+const ToDoLandingPage = ({ userId }) => {
   const [todoLists, setTodoLists] = useState([]);
   const [selectedTodo, setSelectedTodo] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -14,7 +14,7 @@ const ToDoLanding = ({ userId }) => {
   useEffect(() => {
     const fetchToDos = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/todo/user/${userId}`);
+        const response = await axios.get(`http://localhost:8080/api/user/allT`);
         setTodoLists(response.data || []);
       } catch (error) {
         console.error("Failed to fetch to-do lists:", error);
@@ -55,9 +55,14 @@ const ToDoLanding = ({ userId }) => {
 
   return (
     <div className="screen">
-      <div className="navbar">
+      <nav className="navbar">
         <h1 className="navbar-logo">TaskBuster</h1>
-      </div>
+        <div className="navbar-links">
+          <Link to="/" className="nav-link">Home</Link>
+          <Link to="/profile" className="nav-link">Profile</Link>
+          <Link to="/add-todo" className="nav-link">Add To-Do</Link>
+        </div>
+      </nav>
 
       <div className="todo-container">
         <h2 className="header">Your To-Do Lists</h2>
@@ -121,4 +126,4 @@ const ToDoLanding = ({ userId }) => {
   );
 };
 
-export default ToDoLanding;
+export default ToDoLandingPage;

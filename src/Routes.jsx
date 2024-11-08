@@ -1,11 +1,11 @@
 // src/RoutesConfig.jsx
 import React from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
-import Register from './components/Register';
-import Login from './components/Login';
-import UserProfile from './components/UserProfile';
-import ToDoLandingPage from './components/ToDoLanding';
-import AddToDo from './components/AddToDo';
+import Register from './Mefania components/Register';
+import Login from './Mefania components/Login';
+import UserProfile from './Mefania components/UserProfile';
+import ToDoLandingPage from './Mefania components/ToDoLandingPage';
+import AddToDo from './Mefania components/AddToDo';
 
 const RoutesConfig = ({ loggedInUserId, handleLogin }) => (
   <Routes>
