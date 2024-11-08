@@ -1,0 +1,30 @@
+.row {
+    padding-top: 5em;
+    padding-left: 10em;
+    padding-right: 10em;
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: flex-start; 
+}
+.col-md-4 {
+    padding-bottom: 5em;
+    flex: 0 0 30%; 
+    max-width: 30%; 
+    margin-bottom: 20px;
+    margin-right: 39px;
+}
+.screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 190vh;
+    min-width: 190vh;
+    background-color: #f8f8f8;
+/* Space for the navbar */
+}
+#root {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+}
