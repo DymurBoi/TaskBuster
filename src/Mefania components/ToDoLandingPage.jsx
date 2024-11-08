@@ -1,27 +1,46 @@
-// src/components/ToDoLandingPage.jsx
+// src/components/ToDoListLanding.jsx
 import React, { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 import './css.css';
 
-const ToDoLandingPage = ({ userId }) => {
-  const [todoLists, setTodoLists] = useState([]);
+const API_BASE_URL = "http://localhost:8080/api/user";
+
+const ToDoListLanding = () => {
+  const [todos, setTodos] = useState([]);
   const [selectedTodo, setSelectedTodo] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editFormData, setEditFormData] = useState({ title: '', description: '' });
   const navigate = useNavigate();
 
+  const token = localStorage.getItem('authToken');
+
   useEffect(() => {
     const fetchToDos = async () => {
+      if (!token) {
+        console.error("Token is missing");
+        return;
+      }
+
       try {
-        const response = await axios.get(`http://localhost:8080/api/user/allT`);
-        setTodoLists(response.data || []);
+        const response = await axios.get(`${API_BASE_URL}/allT`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setTodos(response.data || []);
       } catch (error) {
-        console.error("Failed to fetch to-do lists:", error);
+        console.error("Failed to fetch to-do list:", error);
       }
     };
-    if (userId) fetchToDos();
-  }, [userId]);
+
+    fetchToDos();
+  }, [token]);
+
+  const handleViewDetails = (todo) => {
+    setSelectedTodo(todo);
+    setIsEditing(false);
+  };
 
   const handleEdit = (todo) => {
     setSelectedTodo(todo);
@@ -31,8 +50,13 @@ const ToDoLandingPage = ({ userId }) => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/todo/${id}`);
-      setTodoLists(todoLists.filter(todo => todo.toDoListID !== id));
+      const response = await axios.delete(`${API_BASE_URL}/deleteT/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      console.log("Delete response:", response);
+      setTodos(todos.filter(todo => todo.toDoListID !== id));
     } catch (error) {
       console.error("Failed to delete to-do:", error);
     }
@@ -40,10 +64,16 @@ const ToDoLandingPage = ({ userId }) => {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    const updatedData = { ...selectedTodo, ...editFormData };
     try {
-      await axios.put(`http://localhost:8080/api/todo/${selectedTodo.toDoListID}`, updatedData);
-      setTodoLists(todoLists.map(todo =>
+      const updatedData = { ...selectedTodo, ...editFormData };
+      const response = await axios.put(`${API_BASE_URL}/updateT`, updatedData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: { id: selectedTodo.toDoListID }
+      });
+      console.log("Update response:", response);
+      setTodos(todos.map(todo =>
         todo.toDoListID === selectedTodo.toDoListID ? { ...todo, ...editFormData } : todo
       ));
       setIsEditing(false);
@@ -60,45 +90,49 @@ const ToDoLandingPage = ({ userId }) => {
         <div className="navbar-links">
           <Link to="/" className="nav-link">Home</Link>
           <Link to="/profile" className="nav-link">Profile</Link>
-          <Link to="/add-todo" className="nav-link">Add To-Do</Link>
         </div>
       </nav>
 
       <div className="todo-container">
-        <h2 className="header">Your To-Do Lists</h2>
-        <div className="todo-lists">
-          {todoLists.length > 0 ? (
-            todoLists.map((list, index) => (
-              <div key={list.toDoListID} className="todo-list-card">
-                <h3 className="list-title">To-Do List {index + 1}</h3>
-                {list.todos && list.todos.map(todo => (
-                  <div key={todo.toDoListID} className="todo-card">
-                    <div className="todo-header">
-                      <h3>{todo.title}</h3>
-                      <div className="menu-icon">
-                        <span onClick={() => handleEdit(todo)}>Edit</span>
-                        <span onClick={() => handleDelete(todo.toDoListID)}>Delete</span>
-                      </div>
-                    </div>
-                    <p>{todo.description}</p>
-                  </div>
-                ))}
-              </div>
-            ))
-          ) : (
-            <p>No to-do items found.</p>
-          )}
+        <h2 className="header">Your To-Do List</h2>
+        <button onClick={() => navigate('/todos/new')} className="button">Add To-Do</button>
+        {todos.length > 0 ? (
+          todos.map(todo => (
+            <div key={todo.toDoListID} className="todo-item">
+              <h3
+                onClick={() => handleViewDetails(todo)}
+                className="todo-title"
+              >
+                {todo.title}
+              </h3>
+              <h2
+                 onClick={() => handleViewDetails(todo)}
+                className="todo-title"
+              >
+                {todo.description}
+          
+              </h2>
+              <button onClick={() => handleEdit(todo)} className="button">Edit</button>
+              <button onClick={() => handleDelete(todo.toDoListID)} className="button">Delete</button>
+            </div>
+          ))
+        ) : (
+          <p className="text-color-black">No to-do items found.</p>
+        )}
 
-          {/* Add New To-Do List Card */}
-          <div className="todo-list-card add-list-card" onClick={() => navigate('/todos/new')}>
-            <h3>+ Add New To-Do List</h3>
+        {selectedTodo && !isEditing && (
+          <div className="details-view">
+            <h3 className="text-color-black">To-Do Details</h3>
+            <p className="text-color-black"><strong>Title:</strong> {selectedTodo.title}</p>
+            <p className="text-color-black"><strong>Description:</strong> {selectedTodo.description}</p>
+            <p className="text-color-black"><strong>Status:</strong> {selectedTodo.status}</p>
           </div>
-        </div>
+        )}
 
         {isEditing && (
           <form onSubmit={handleUpdate} className="edit-form">
-            <h3>Edit To-Do</h3>
-            <label>
+            <h3 className="text-color-black">Edit To-Do</h3>
+            <label className="label">
               Title:
               <input
                 type="text"
@@ -108,7 +142,7 @@ const ToDoLandingPage = ({ userId }) => {
                 className="input"
               />
             </label>
-            <label>
+            <label className="label">
               Description:
               <textarea
                 value={editFormData.description}
@@ -126,4 +160,4 @@ const ToDoLandingPage = ({ userId }) => {
   );
 };
 
-export default ToDoLandingPage;
+export default ToDoListLanding;

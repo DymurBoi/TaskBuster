@@ -135,6 +135,10 @@ const UserProfile = () => {
               <button onClick={handleDeleteUser} className="button">Delete Account</button>
             </div>
           )}
+          <div style={{ marginTop: '20px' }}>
+            <button onClick={handleViewToDoList} className="button">View To-Do List</button>
+            <button onClick={handleAddToDoList} className="button">Add To-Do</button>
+          </div>
         </div>
       </div>
     </div>
