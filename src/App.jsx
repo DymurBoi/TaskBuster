@@ -1,20 +1,16 @@
-// src/App.jsx
-import { useState } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import RoutesConfig from './Routes';
+import { useEffect, useState } from 'react';
+import { Link } from "react-router-dom";
+import axios from 'axios';
+import Router from './Router.jsx'
+import './App.css';
 
-const App = () => {
-  const [loggedInUserId, setLoggedInUserId] = useState(null);
-
-  const handleLogin = (id) => {
-    setLoggedInUserId(id);
-  };
-
-  return (
-    <Router>
-      <RoutesConfig loggedInUserId={loggedInUserId} handleLogin={handleLogin} />
-    </Router>
-  );
-};
+function App() {
+  return(
+  <>
+  <h1>Task and Tag CRUD</h1>
+    <Router/>
+  </>
+  )
+}
 
 export default App;
