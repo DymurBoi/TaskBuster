@@ -14,6 +14,7 @@ const ToDoListLanding = () => {
   const navigate = useNavigate();
 
   const token = localStorage.getItem('authToken');
+  const userId = localStorage.getItem('loggedInUserId'); // Assuming userId is stored in local storage
 
   useEffect(() => {
     const fetchToDos = async () => {
@@ -21,9 +22,12 @@ const ToDoListLanding = () => {
         console.error("Token is missing");
         return;
       }
-
+  
+      const userId = localStorage.getItem('loggedInUserId'); // Ensure userId is stored in localStorage after login
+      console.log("Retrieved userId:", userId);
+  
       try {
-        const response = await axios.get(`${API_BASE_URL}/allT`, {
+        const response = await axios.get(`${API_BASE_URL}/todos?userId=${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -33,7 +37,7 @@ const ToDoListLanding = () => {
         console.error("Failed to fetch to-do list:", error);
       }
     };
-
+  
     fetchToDos();
   }, [token]);
 
@@ -55,7 +59,6 @@ const ToDoListLanding = () => {
           Authorization: `Bearer ${token}`
         }
       });
-      console.log("Delete response:", response);
       setTodos(todos.filter(todo => todo.toDoListID !== id));
     } catch (error) {
       console.error("Failed to delete to-do:", error);
@@ -72,7 +75,6 @@ const ToDoListLanding = () => {
         },
         params: { id: selectedTodo.toDoListID }
       });
-      console.log("Update response:", response);
       setTodos(todos.map(todo =>
         todo.toDoListID === selectedTodo.toDoListID ? { ...todo, ...editFormData } : todo
       ));
@@ -99,19 +101,8 @@ const ToDoListLanding = () => {
         {todos.length > 0 ? (
           todos.map(todo => (
             <div key={todo.toDoListID} className="todo-item">
-              <h3
-                onClick={() => handleViewDetails(todo)}
-                className="todo-title"
-              >
-                {todo.title}
-              </h3>
-              <h2
-                 onClick={() => handleViewDetails(todo)}
-                className="todo-title"
-              >
-                {todo.description}
-          
-              </h2>
+              <h3 onClick={() => handleViewDetails(todo)} className="todo-title">{todo.title}</h3>
+              <h2 onClick={() => handleViewDetails(todo)} className="todo-title">{todo.description}</h2>
               <button onClick={() => handleEdit(todo)} className="button">Edit</button>
               <button onClick={() => handleDelete(todo.toDoListID)} className="button">Delete</button>
             </div>
