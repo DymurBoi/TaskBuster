@@ -13,14 +13,11 @@ import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
     typography: {
-      body1: {
-        color: 'red'
-      },
       h1: {
         color: 'black',
       },
       button: {
-        color: 'red'
+        color: 'yellow'
       }
     }
   });
@@ -63,6 +60,7 @@ function TaskView() {
       </CardContent>
       <CardActions>
       <Link to={`/taskupdate/${task.taskId}`}>Update Task</Link>
+      <Link to="/readComments" state={{ taskId: task.taskId }}>View Comments</Link>
       <Button size="small" onClick={() => deleteTask(task.taskId)}>Delete Task</Button>
       </CardActions>
     </Card>

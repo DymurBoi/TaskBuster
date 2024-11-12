@@ -5,7 +5,7 @@ import Register from './Mefania components/Register';
 import Login from './Mefania components/Login';
 import TaskView from './Maquiling_Components/TaskView';
 import TaskUpdate from './Maquiling_Components/TaskUpdate';
-
+import CommentView from './Maquiling_Components/CommentView'
 const RoutesConfig = ({ loggedInUserId, handleLogin }) => (
   <Routes>
     <Route path="/" element={<Navigate to="/register" />} />
@@ -13,6 +13,7 @@ const RoutesConfig = ({ loggedInUserId, handleLogin }) => (
     <Route path="/login" element={<Login onLogin={handleLogin} />} />
     <Route path="/taskview" element={<TaskView/>}/>
     <Route path="/taskupdate/:taskId" element={<TaskUpdate/>}/>
+    <Route path="/readComments/" element={<CommentView/>}/>
   </Routes>
 );
 
