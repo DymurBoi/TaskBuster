@@ -6,12 +6,10 @@ const Dashboard = () => {
     const [newTask, setNewTask] = useState({ title: "", description: "" });
     const [editTask, setEditTask] = useState(null);
 
-    // Fetch tasks on component mount
     useEffect(() => {
         fetchTasks();
     }, []);
 
-    // Fetch tasks from backend
     const fetchTasks = async () => {
         try {
             const response = await axios.get("http://localhost:8080/api/tasks/view");
@@ -21,7 +19,6 @@ const Dashboard = () => {
         }
     };
 
-    // Handle adding a new task
     const handleAddTask = async () => {
         try {
             const response = await axios.post("http://localhost:8080/api/tasks/add", newTask);
@@ -32,7 +29,6 @@ const Dashboard = () => {
         }
     };
 
-    // Handle task update
     const handleUpdateTask = async (task) => {
         try {
             const response = await axios.put(`http://localhost:8080/api/tasks/update/${task.id}`, task);
@@ -43,7 +39,6 @@ const Dashboard = () => {
         }
     };
 
-    // Handle task deletion
     const handleDeleteTask = async (taskId) => {
         try {
             await axios.delete(`http://localhost:8080/api/tasks/delete/${taskId}`);
@@ -53,20 +48,62 @@ const Dashboard = () => {
         }
     };
 
-    // Handle form input changes for new task
     const handleNewTaskChange = (e) => {
         const { name, value } = e.target;
         setNewTask({ ...newTask, [name]: value });
     };
 
-    // Render component
+    // Inline styling
+    const containerStyle = {
+        maxWidth: '800px',
+        margin: '0 auto',
+        padding: '20px',
+        backgroundColor: '#f3f3f3',
+        borderRadius: '8px',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    };
+
+    const headerStyle = {
+        textAlign: 'center',
+        color: '#333',
+    };
+
+    const inputStyle = {
+        padding: '8px',
+        marginBottom: '10px',
+        width: '100%',
+        border: '1px solid #ccc',
+        borderRadius: '4px',
+    };
+
+    const buttonStyle = {
+        padding: '8px 16px',
+        fontSize: '14px',
+        color: '#fff',
+        backgroundColor: '#007bff',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        marginRight: '5px',
+        transition: 'background-color 0.3s',
+    };
+
+    const taskCardStyle = {
+        border: '1px solid #ddd',
+        padding: '10px',
+        borderRadius: '4px',
+        marginBottom: '10px',
+        backgroundColor: '#fff',
+    };
+
     return (
-        <div>
-            <h1>Task Dashboard</h1>
+        <div style={containerStyle}>
+            <h1 style={headerStyle}>Task Dashboard</h1>
 
             <div>
-                <h2>Add New Task</h2>
+                <h2 style={headerStyle}>Add New Task</h2>
                 <input
+                    style={inputStyle}
                     type="text"
                     name="title"
                     placeholder="Title"
@@ -74,42 +111,72 @@ const Dashboard = () => {
                     onChange={handleNewTaskChange}
                 />
                 <input
+                    style={inputStyle}
                     type="text"
                     name="description"
                     placeholder="Description"
                     value={newTask.description}
                     onChange={handleNewTaskChange}
                 />
-                <button onClick={handleAddTask}>Add Task</button>
+                <button
+                    style={{ ...buttonStyle, backgroundColor: '#28a745' }}
+                    onMouseOver={(e) => (e.target.style.backgroundColor = '#218838')}
+                    onMouseOut={(e) => (e.target.style.backgroundColor = '#28a745')}
+                    onClick={handleAddTask}
+                >
+                    Add Task
+                </button>
             </div>
 
             <div>
-                <h2>Task List</h2>
+                <h2 style={headerStyle}>Task List</h2>
                 {tasks.map(task => (
-                    <div key={task.id} style={{ border: "1px solid #ccc", padding: "10px", marginBottom: "10px" }}>
+                    <div key={task.id} style={taskCardStyle}>
                         {editTask && editTask.id === task.id ? (
                             <>
                                 <input
+                                    style={inputStyle}
                                     type="text"
                                     name="title"
                                     value={editTask.title}
                                     onChange={(e) => setEditTask({ ...editTask, title: e.target.value })}
                                 />
                                 <input
+                                    style={inputStyle}
                                     type="text"
                                     name="description"
                                     value={editTask.description}
                                     onChange={(e) => setEditTask({ ...editTask, description: e.target.value })}
                                 />
-                                <button onClick={() => handleUpdateTask(editTask)}>Save</button>
-                                <button onClick={() => setEditTask(null)}>Cancel</button>
+                                <button
+                                    style={buttonStyle}
+                                    onClick={() => handleUpdateTask(editTask)}
+                                >
+                                    Save
+                                </button>
+                                <button
+                                    style={{ ...buttonStyle, backgroundColor: '#6c757d' }}
+                                    onClick={() => setEditTask(null)}
+                                >
+                                    Cancel
+                                </button>
                             </>
                         ) : (
                             <>
                                 <h3>{task.title}</h3>
                                 <p>{task.description}</p>
-                                <button onClick={() => setEditTask(task)}>Edit</button>
-                                <button onClick={() => handleDeleteTask(task.id)}>Delete</button>
+                                <button
+                                    style={buttonStyle}
+                                    onClick={() => setEditTask(task)}
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    style={{ ...buttonStyle, backgroundColor: '#dc3545' }}
+                                    onClick={() => handleDeleteTask(task.id)}
+                                >
+                                    Delete
+                                </button>
                             </>
                         )}
                     </div>
