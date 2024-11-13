@@ -1,0 +1,56 @@
+body {
+    background-color: #f0f2f5; /* Light gray background */
+    font-family: Arial, sans-serif; /* Font style */
+}
+
+.container {
+    max-width: 400px; /* Center container */
+    margin: 100px auto; /* Center vertically and horizontally */
+    padding: 20px;
+    background: white; /* White background */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+h2 {
+    text-align: center; /* Center heading */
+    color: #333; /* Dark text */
+}
+
+input[type="email"],
+input[type="password"] {
+    width: 100%; /* Full width inputs */
+    padding: 10px; /* Padding inside inputs */
+    margin: 10px 0; /* Space between inputs */
+    border: 1px solid #ced4da; /* Light gray border */
+    border-radius: 4px; /* Rounded corners */
+    transition: border-color 0.2s; /* Smooth border color change */
+    box-sizing: border-box;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+    border-color: #80bdff; /* Change border color on focus */
+    outline: none; /* Remove default outline */
+}
+
+button {
+    width: 100%; /* Full width button */
+    background-color: #007bff; /* Primary button color */
+    color: white; /* Button text color */
+    border: none; /* No border */
+    padding: 10px; /* Button padding */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor */
+    font-size: 16px; /* Font size */
+}
+
+button:hover {
+    background-color: #0056b3; /* Darker on hover */
+}
+
+.error-message {
+    color: red; /* Error message color */
+    text-align: center; /* Center align error message */
+    margin-top: 10px; /* Space above error message */
+}
