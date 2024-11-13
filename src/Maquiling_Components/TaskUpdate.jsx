@@ -25,8 +25,11 @@ function TaskUpdate() {
     title: '',
     description: '',
     status: 'Pending',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     dueDate: '',
-    tag: { tagId: '', name: '' }
+    tag: { tagId: '' },
+    toDoList: {toDoListID: '' },
   });
 
   useEffect(() => {

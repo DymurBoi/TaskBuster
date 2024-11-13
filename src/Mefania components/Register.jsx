@@ -25,7 +25,7 @@ const Register = () => {
   };
 
   return (
-    <div className="screen">
+    <div>
       <nav className="navbar">
         <h1 className="navbar-logo">TaskBuster</h1>
         <div className="navbar-links">
@@ -34,7 +34,7 @@ const Register = () => {
           <Link to="/login" className="nav-link">Login</Link>
         </div>
       </nav>
-
+      <div className='screen'>
       <div className="register-container">
         <h2 className="header">Register</h2>
         <form onSubmit={handleSubmit}>
@@ -64,6 +64,7 @@ const Register = () => {
           />
           <button type="submit" className="button">Register</button>
         </form>
+      </div>
       </div>
     </div>
   );
