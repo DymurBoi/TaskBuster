@@ -85,9 +85,8 @@ const UserProfile = () => {
       <nav className="navbar">
         <h1 className="navbar-logo">TaskBuster</h1>
         <div className="navbar-links">
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/register" className="nav-link">Register</Link>
-          <Link to="/login" className="nav-link">Login</Link>
+        <Link to="/" className="nav-link">Home</Link>
+        <Link to="/profile" className="nav-link">Profile</Link>
         </div>
       </nav>
 
