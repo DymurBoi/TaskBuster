@@ -13,12 +13,13 @@ import AddToDo from './Mefania components/AddToDo';
 
 const RoutesConfig = ({ loggedInUserId, handleLogin }) => (
   <Routes>
-    <Route path="/" element={<Navigate to="/register" />} />
+  <Route path="/" element={<Navigate to="/register" />} />
     <Route path="/register" element={<Register />} />
     <Route path="/login" element={<Login onLogin={handleLogin} />} />
-    <Route path="/profile" element={<UserProfile />} />
-    <Route path="/todos/new" element={<AddToDo />} />
-    <Route path="/register" element={<Register />} />
+    <Route path="/todos" element={<ToDoLandingPage userId={loggedInUserId} />} />
+    <Route path="/profile" element={<UserProfile loggedInUserId={loggedInUserId} />} />
+    <Route path="/todos/new" element={<AddToDo userId={loggedInUserId} />} />
+    
     <Route path="/taskview" element={<TaskView/>}/>
     <Route path="/taskupdate/:taskId" element={<TaskUpdate/>}/>
     <Route path="/readComments" element={<CommentView/>}/>
