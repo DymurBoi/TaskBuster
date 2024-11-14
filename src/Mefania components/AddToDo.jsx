@@ -52,7 +52,6 @@ const AddToDo = () => {
         <div className="navbar-links">
           <Link to="/" className="nav-link">Home</Link>
           <Link to="/profile" className="nav-link">Profile</Link>
-          <Link to="/add-todo" className="nav-link">Add To-Do</Link>
         </div>
       </nav>
 
