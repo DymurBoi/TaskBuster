@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -24,15 +24,29 @@ const theme = createTheme({
 });
 
 function TaskView() {
+  const { toDoListID } = useParams();
   const [tasks, setTasks] = useState([]);
   const navigate = useNavigate();
+  const token = localStorage.getItem('authToken');
   useEffect(() => {
-    axios.get('/api/taskbuster/getTask')
-      .then(response => {
-        setTasks(response.data);
-      })
-      .catch(error => console.error("Error fetching tasks:", error));
-  }, []);
+    const fetchTasks = async () => {
+      if (!token) {
+        console.error("Token is missing");
+        return;
+      }
+
+      try {
+        const response = await axios.get(`http://localhost:8080/api/taskbuster/getTasks?toDoListID=${toDoListID}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setTasks(response.data || []);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
+    };
+
+    fetchTasks();
+  }, [token, toDoListID]);
   
   const deleteTask = (taskId) => {
     axios.delete(`/api/taskbuster/deleteTask/${taskId}`)
@@ -41,6 +55,7 @@ function TaskView() {
       })
       .catch(error => console.error("Error deleting task:", error));
   };
+
     const handleCardClick = () => {
       navigate('/createTask')
     };
