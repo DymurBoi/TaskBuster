@@ -100,7 +100,7 @@ const ToDoListLanding = () => {
         <button onClick={() => navigate('/todos/new')} className="button">Add To-Do</button>
         {todos.length > 0 ? (
           todos.map(todo => (
-            <div key={todo.toDoListID} className="todo-item">
+            <div key={todo.toDoListID} className="todo-item" onClick={() => navigate(`/taskview/${todo.toDoListID}`)}>
               <h3 onClick={() => handleViewDetails(todo)} className="todo-title">{todo.title}</h3>
               <h2 onClick={() => handleViewDetails(todo)} className="todo-title">{todo.description}</h2>
               <button onClick={() => handleEdit(todo)} className="button">Edit</button>

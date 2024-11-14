@@ -19,8 +19,8 @@ const RoutesConfig = ({ loggedInUserId, handleLogin }) => (
     <Route path="/todos" element={<ToDoLandingPage userId={loggedInUserId} />} />
     <Route path="/profile" element={<UserProfile loggedInUserId={loggedInUserId} />} />
     <Route path="/todos/new" element={<AddToDo userId={loggedInUserId} />} />
-    
-    <Route path="/taskview" element={<TaskView/>}/>
+
+    <Route path="/taskview/:toDoListID" element={<TaskView />} />
     <Route path="/taskupdate/:taskId" element={<TaskUpdate/>}/>
     <Route path="/readComments" element={<CommentView/>}/>
     <Route path="/createTask" element={<TaskCreate/>}/>
