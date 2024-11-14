@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -36,7 +36,7 @@ function TaskView() {
       }
 
       try {
-        const response = await axios.get(`/api/taskbuster/getTasks?toDoListID=${toDoListID}`, {
+        const response = await axios.get(`http://localhost:8080/api/taskbuster/getTasks?toDoListID=${toDoListID}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setTasks(response.data || []);
@@ -55,7 +55,7 @@ function TaskView() {
       })
       .catch(error => console.error("Error deleting task:", error));
   };
-  
+
     const handleCardClick = () => {
       navigate('/createTask')
     };
