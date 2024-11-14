@@ -1,7 +1,7 @@
 .row {
     padding-top: 5em;
-    padding-left: 10em;
-    padding-right: 10em;
+    padding-left: 2em;
+    padding-right: 2em;
     display: flex; 
     flex-wrap: wrap; 
     justify-content: space-between; /* Adjusts space between cards */
@@ -12,8 +12,9 @@
     flex: 0 0 23%; /* Make each card 23% to allow for spacing */
     max-width: 23%; /* Maximum width of each card */
     margin-bottom: 20px;
-    margin-right: 60px;
+    margin-right: 20px;
 }
+
 .fixed-card {
     width: 250px; /* Set a fixed width */
     height: 300px; /* Set a fixed height */

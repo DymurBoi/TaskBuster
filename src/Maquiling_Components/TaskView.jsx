@@ -46,6 +46,15 @@ function TaskView() {
     };
   return (
     <ThemeProvider theme={theme}>
+    <nav className="navbar">
+        <h1 className="navbar-logo">TaskBuster</h1>
+        <div className="navbar-links">
+          <Link to="/" className="nav-link">Home</Link>
+          <Link to="/register" className="nav-link">Register</Link>
+          <Link to="/login" className="nav-link">Login</Link>
+        </div>
+        </nav>
+      <div className='screen'>
       <Typography variant="h1" sx={{ color: 'black', textAlign: 'center' }}>
         Task List
       </Typography>
@@ -86,6 +95,7 @@ function TaskView() {
         </Typography>
       </CardContent>
     </Card>
+      </div>
       </div>
     </ThemeProvider>
   );
