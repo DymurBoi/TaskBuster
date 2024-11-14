@@ -1,14 +1,4 @@
 /* Screen styling */
-.screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    min-width: 190vh;
-    background-color: #f8f8f8;
-/* Space for the navbar */
-}
-
 p{
     color:#000;
 }
@@ -18,12 +8,11 @@ h3{
 }
 
 /* Navbar styling */
-.screen nav {
+.navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    max-width: 186vh;
+    width: auto;
     padding: 10px 20px;
     background-color: #e3b500;
     color: white;
@@ -92,7 +81,9 @@ button {
     margin: 10px;
     border-radius: 10px;
 }
-
+.screen{
+    align-items: center;
+}
 /*Register Container*/
 .register-container {
     display: flex;

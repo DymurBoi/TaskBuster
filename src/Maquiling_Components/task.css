@@ -1,0 +1,33 @@
+.row {
+    padding-top: 5em;
+    padding-left: 10em;
+    padding-right: 10em;
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: space-between; /* Adjusts space between cards */
+}
+
+.col-md-4 {
+    padding-bottom: 5em;
+    flex: 0 0 23%; /* Make each card 23% to allow for spacing */
+    max-width: 23%; /* Maximum width of each card */
+    margin-bottom: 20px;
+    margin-right: 60px;
+}
+.fixed-card {
+    width: 250px; /* Set a fixed width */
+    height: 300px; /* Set a fixed height */
+}
+.screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 100vw;
+    min-height: 100vh;
+    background-color: #f8f8f8;
+/* Space for the navbar */
+}
+#root {
+    margin: 0 auto;
+    text-align: center;
+}
