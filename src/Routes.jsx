@@ -7,6 +7,10 @@ import TaskView from './Maquiling_Components/TaskView';
 import TaskUpdate from './Maquiling_Components/TaskUpdate';
 import CommentView from './Maquiling_Components/CommentView'
 import TaskCreate from './Maquiling_Components/TaskCreate';
+import UserProfile from './Mefania components/UserProfile';
+import ToDoLandingPage from './Mefania components/ToDoLandingPage';
+import AddToDo from './Mefania components/AddToDo';
+
 const RoutesConfig = ({ loggedInUserId, handleLogin }) => (
   <Routes>
     <Route path="/" element={<Navigate to="/register" />} />

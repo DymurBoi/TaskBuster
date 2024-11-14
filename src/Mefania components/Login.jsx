@@ -21,7 +21,7 @@ const Login = ({ onLogin }) => {
 
       alert('Logged In Successfully!');
       onLogin(userId); // Pass userId to App
-      navigate('/profile'); // Redirect to profile after login
+      navigate('/todos'); // Redirect to profile after login
     } catch (error) {
       console.error('Failed to log in:', error);
       alert('Invalid email or password. Please try again.');

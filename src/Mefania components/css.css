@@ -1,6 +1,10 @@
 /* Screen styling */
 p{
-    color:#000
+    color:#000;
+}
+
+h3{
+  color :#000;
 }
 
 /* Navbar styling */
@@ -64,7 +68,7 @@ p{
 }
 
 /* Button styling */
-.button {
+button {
     height: 50px;
     width: 95%;
     padding: 10px;
@@ -95,3 +99,103 @@ p{
     text-align: center;
     margin-top: 200px;
 }
+
+/*Profile Container*/
+
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-top: 200px;
+  }
+
+  /*ToDoList Container styling */
+  .todo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-top: 200px;
+  }
+
+  /* To-do item styling */
+.todo-item {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #e0e0e0;
+    border-radius: 8px;
+    text-align: left;
+  }
+  
+  .todo-title {
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: black;
+  }
+
+  /* Details view styling */
+.details-view {
+    width: 100%;
+    margin-top: 20px;
+    border-top: 2px solid #000;
+    padding-top: 10px;
+  }
+  
+  /* Edit form styling */
+  .edit-form {
+    width: 100%;
+    margin-top: 20px;
+  }
+  
+  .label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    width: 100%;
+    color: black;
+  }
+  
+
+  /* Container for form */
+.addtodo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 500px;
+    max-width: 600px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-top: 200px;
+  }
+
+  .textarea {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #bebaba;
+  }
+  
+  .textarea {
+    resize: vertical;
+  }
