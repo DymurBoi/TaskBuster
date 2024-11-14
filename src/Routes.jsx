@@ -16,6 +16,9 @@ const RoutesConfig = ({ loggedInUserId, handleLogin }) => (
     <Route path="/" element={<Navigate to="/register" />} />
     <Route path="/register" element={<Register />} />
     <Route path="/login" element={<Login onLogin={handleLogin} />} />
+    <Route path="/profile" element={<UserProfile />} />
+    <Route path="/todos/new" element={<AddToDo />} />
+    <Route path="/register" element={<Register />} />
     <Route path="/taskview" element={<TaskView/>}/>
     <Route path="/taskupdate/:taskId" element={<TaskUpdate/>}/>
     <Route path="/readComments" element={<CommentView/>}/>
