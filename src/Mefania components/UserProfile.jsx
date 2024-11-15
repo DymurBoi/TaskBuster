@@ -83,9 +83,8 @@ const UserProfile = () => {
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('loggedInUserId');
-    navigate('/login'); 
+    navigate('/login');
   };
-  
   return (
     <div className="screen">
       <nav className="navbar">
