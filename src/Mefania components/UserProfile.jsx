@@ -80,6 +80,12 @@ const UserProfile = () => {
 
   if (!user) return <p>Loading...</p>;
 
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('loggedInUserId');
+    navigate('/login'); 
+  };
+  
   return (
     <div className="screen">
       <nav className="navbar">
@@ -87,6 +93,7 @@ const UserProfile = () => {
         <div className="navbar-links">
         <Link to="/" className="nav-link">Home</Link>
         <Link to="/profile" className="nav-link">Profile</Link>
+        <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
         </div>
       </nav>
 

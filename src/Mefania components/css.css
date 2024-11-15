@@ -199,3 +199,13 @@ button {
   .textarea {
     resize: vertical;
   }
+
+  .logout-text {
+    cursor: pointer;
+    color: #007bff;
+    text-decoration: underline;
+  }
+  
+  .logout-text:hover {
+    color: #0056b3;
+  }
