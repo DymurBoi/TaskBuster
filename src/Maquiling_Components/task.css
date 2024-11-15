@@ -1,11 +1,11 @@
 .row {
-    padding-top: 5em;
-    padding-left: 2em;
-    padding-right: 2em;
-    display: flex; 
-    flex-wrap: wrap; 
-    justify-content: space-between; /* Adjusts space between cards */
-}
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Adds uniform spacing between cards */
+    justify-content: center; /* Centers the items */
+    padding: 2em;
+  }
+  
 
 .col-md-4 {
     padding-bottom: 5em;
@@ -15,10 +15,7 @@
     margin-right: 20px;
 }
 
-.fixed-card {
-    width: 250px; /* Set a fixed width */
-    height: 300px; /* Set a fixed height */
-}
+
 .screen {
     display: flex;
     flex-direction: column;

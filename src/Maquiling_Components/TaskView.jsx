@@ -10,6 +10,9 @@ import axios from 'axios';
 import './task.css';
 import { ThemeProvider } from '@emotion/react';
 import { createTheme } from '@mui/material/styles';
+import Grid from '@mui/material/Grid2';
+import { styled } from '@mui/material/styles';
+import Paper from '@mui/material/Paper';
 
 const theme = createTheme({
   typography: {
@@ -22,7 +25,13 @@ const theme = createTheme({
     }
   }
 });
-
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  textAlign: 'center',
+  color: theme.palette.text.secondary,
+}));
 function TaskView() {
   const { toDoListID } = useParams();
   const [tasks, setTasks] = useState([]);
@@ -60,6 +69,7 @@ function TaskView() {
       navigate('/createTask')
     };
   return (
+    <div>
     <ThemeProvider theme={theme}>
     <nav className="navbar">
         <h1 className="navbar-logo">TaskBuster</h1>
@@ -70,15 +80,16 @@ function TaskView() {
         </div>
         </nav>
       <div className='screen'>
-      <Typography variant="h1" sx={{ color: 'black', textAlign: 'center' }}>
+      <Typography variant="h2" sx={{ color: 'black', textAlign: 'center' }}>
         Task List
       </Typography>
-      
+      <Grid container spacing={3} justifyContent="center">
       {/* Wrapping the task list in a container that centers content */}
       <div className="row">
         {tasks.map(task => (
-          <div key={task.taskId} className="col-md-4">
-            <Card className="fixed-card" sx={{ minWidth: 275 }}>
+            <Grid item xs={12} sm={6} md={4}>
+              <Item>
+            <Card sx={{ minWidth: 275, maxWidth: 345, margin: "0 auto" }}>
               <CardContent>
                 <Typography variant="h5" component="div">
                   {task.title}
@@ -100,9 +111,12 @@ function TaskView() {
                 <Button size="small" onClick={() => deleteTask(task.taskId)}>Delete Task</Button>
               </CardActions>
             </Card>
-          </div>
+            </Item>
+            </Grid>
         ))}
-        <Card className="fixed-card" sx={{minWidth: 275, cursor: 'pointer', '&:hover': 
+        <Grid item xs={12} md={6} lg={4}>
+        <Item>
+        <Card sx={{maxWidth: 345, margin: "0 auto", minWidth: 320,minHeight: 242, cursor: 'pointer', '&:hover': 
         {boxShadow: 6,},}} onClick={handleCardClick}>
       <CardContent>
         <Typography variant="h5" component="div">
@@ -110,9 +124,13 @@ function TaskView() {
         </Typography>
       </CardContent>
     </Card>
+    </Item>
+    </Grid>
       </div>
+      </Grid>
       </div>
     </ThemeProvider>
+    </div>
   );
 }
 

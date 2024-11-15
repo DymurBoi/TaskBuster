@@ -29,8 +29,8 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="screen">
-      <nav className="navbar">
+    <div>
+    <nav className="navbar">
         <h1 className="navbar-logo">TaskBuster</h1>
         <div className="navbar-links">
           <Link to="/" className="nav-link">Home</Link>
@@ -38,7 +38,7 @@ const Login = ({ onLogin }) => {
           <Link to="/login" className="nav-link">Login</Link>
         </div>
       </nav>
-
+    <div className="screen">      
       <div className="screen">
         <div className="login-container">
           <h2 className="header">Login</h2>
@@ -63,6 +63,7 @@ const Login = ({ onLogin }) => {
           </form>
         </div>
       </div>
+    </div>
     </div>
   );
 };
