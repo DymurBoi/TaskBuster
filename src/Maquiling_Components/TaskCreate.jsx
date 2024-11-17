@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import './task.css';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { ThemeProvider } from '@emotion/react';
 import { createTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
@@ -10,7 +10,7 @@ import Grid from '@mui/material/Grid2';
 
 const theme = createTheme({
   typography: {
-    h1: {
+    h2: {
       color: 'black',
       textAlign: 'center',  // Center the heading text
     },
@@ -29,6 +29,8 @@ const theme = createTheme({
 });
 
 function TaskCreate() {
+  const location = useLocation();
+  const { toDoListId } = location.state || {};
   const [newTask, setNewTask] = useState({
     title: '',
     description: '',
@@ -37,7 +39,7 @@ function TaskCreate() {
     updatedAt: new Date().toISOString(),
     dueDate: '',
     tag: { tagId: '' },
-    toDoList: { toDoListID: '' },
+    toDoList: { toDoListID: toDoListId },
   });
 
   const [submittedTask, setSubmittedTask] = useState(null);
@@ -74,7 +76,7 @@ function TaskCreate() {
           updatedAt: new Date().toISOString(),
           dueDate: '',
           tag: { tagId: '' },
-          toDoList: { toDoListID: '' },
+          toDoList: { toDoListID: toDoListId },
         });
       })
       .catch(error => console.error("Error posting task:", error));
@@ -112,7 +114,7 @@ function TaskCreate() {
       </nav>
       <div className='screen'>
         <Container maxWidth="sm" sx={{ mt: 4 }}>
-          <Typography variant="h1" gutterBottom>
+          <Typography variant="h2" gutterBottom>
             Create a Task
           </Typography>
           <div>
@@ -156,17 +158,6 @@ function TaskCreate() {
                   shrink: true,
                 }}
               />
-              {/* Remove the TextField for Tag ID */}
-              <TextField
-                label="Todo List ID"
-                name="todoListId"
-                variant="outlined"
-                type="number"
-                value={newTask.toDoList.toDoListID}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
               <Button
                 type="submit"
                 variant="contained"
@@ -179,7 +170,6 @@ function TaskCreate() {
             </Box>
           </form>
 
-          {/* Display the most recently submitted task */}
           {submittedTask && (
             <Box sx={{ mt: 4, backgroundColor: '#f5f5f5', padding: 2, borderRadius: 2 }}>
               <Typography variant="h6">Recently Submitted Task</Typography>

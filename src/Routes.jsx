@@ -10,7 +10,8 @@ import TaskCreate from './Maquiling_Components/TaskCreate';
 import UserProfile from './Mefania components/UserProfile';
 import ToDoLandingPage from './Mefania components/ToDoLandingPage';
 import AddToDo from './Mefania components/AddToDo';
-
+import TaskDetails from './Maquiling_Components/TaskDetails';
+import CreateComment from './Maquiling_Components/CreateComment'
 const RoutesConfig = ({ loggedInUserId, handleLogin }) => (
   <Routes>
   <Route path="/" element={<Navigate to="/register" />} />
@@ -24,6 +25,8 @@ const RoutesConfig = ({ loggedInUserId, handleLogin }) => (
     <Route path="/taskupdate/:taskId" element={<TaskUpdate/>}/>
     <Route path="/readComments" element={<CommentView/>}/>
     <Route path="/createTask" element={<TaskCreate/>}/>
+    <Route path="/taskdetails/" element={<TaskDetails/>}/>
+    <Route path="/createComment" element={<CreateComment/>}/>
   </Routes>
 );
 

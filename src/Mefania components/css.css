@@ -14,10 +14,9 @@ h3{
     align-items: center;
     width: auto;
     padding: 10px 20px;
-    background-color: #e3b500;
+    background-color: #fdcc01;
     color: white;
-    border-color: #333;
-    border-style: double;
+    margin-bottom: 3%;
 }
 
 .navbar-logo {
@@ -127,7 +126,7 @@ button {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
-    margin-top: 200px;
+    margin-top: 50px;
   }
 
   /* To-do item styling */

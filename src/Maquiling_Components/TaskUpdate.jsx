@@ -4,46 +4,84 @@ import axios from 'axios';
 import { ThemeProvider } from '@emotion/react';
 import { createTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
+import { TextField, Button, Container, Box } from '@mui/material';
+import Grid from '@mui/material/Grid2';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { Link } from 'react-router-dom';
 import './task.css';
+
 const theme = createTheme({
-    typography: {
-      body1: {
-        color: 'red'
-      },
-      h1: {
-        color: 'black'
-      },
-      button: {
-        color: 'red'
-      }
+  typography: {
+    fontFamily: `'Poppins', sans-serif`,
+    h2: {
+      color: 'black',
+      textAlign: 'center',  // Center the heading text
     }
-  });
+  },
+});
+
 function TaskUpdate() {
   const { taskId } = useParams();  // Get taskId from URL
-  const [updateData, setUpdateData] = useState({
-    taskId: taskId || '',  // Initialize taskId with the one from URL
+  const [currentData, setCurrentData] = useState({
+    taskId: '',
     title: '',
     description: '',
     status: 'Pending',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     dueDate: '',
-    tag: { tagId: '' },
-    toDoList: {toDoListID: '' },
+    tag: { tagId: '', name: '' },
+    toDoList: { toDoListID: '' },
+  });
+
+  const [updateData, setUpdateData] = useState({
+    taskId: '',
+    title: '',
+    description: '',
+    status: 'Pending',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    dueDate: '',
+    tag: { tagId: '', name: '' },
+    toDoList: { toDoListID: '' },
   });
 
   useEffect(() => {
     if (taskId) {
-      // Fetch the task details if needed for pre-filling the form
+      // Fetch task details from API
       axios.get(`/api/taskbuster/getTask/${taskId}`)
-        .then(response => setUpdateData(response.data))
+        .then(response => {
+          const task = response.data;
+          setCurrentData(task);
+          setUpdateData(task);  // Pre-fill form with task data
+        })
         .catch(error => console.error("Error fetching task:", error));
     }
   }, [taskId]);
 
+  const updateTag = (tagId, priority) => {
+    // Prepare the data to update the tag
+    const updatedTag = {
+      name: priority,
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Make PUT request to update the tag using the provided tagId
+    axios.put(`/api/taskbuster/putTag?tagId=${tagId}`, updatedTag)
+      .then(response => {
+        console.log("Tag updated successfully:", response.data);
+        // Update the local state with the new tag information
+        setUpdateData(prevData => ({
+          ...prevData,
+          tag: { tagId: response.data.tagId, name: response.data.name },
+        }));
+      })
+      .catch(error => console.error("Error updating tag:", error));
+  };
+
   const updateTask = (task) => {
     axios.put(`/api/taskbuster/putTask`, task, {
-      params: { taskId: task.taskId }
+      params: { taskId: task.taskId },
     })
       .then(response => {
         console.log("Task updated successfully:", response.data);
@@ -58,46 +96,83 @@ function TaskUpdate() {
 
   const handleUpdateChange = (e) => {
     const { name, value } = e.target;
-    setUpdateData(prevData => ({
+    setUpdateData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
   };
 
+  const handleTagUpdate = (tagId, priority) => {
+    updateTag(tagId, priority);
+  };
+
   return (
     <div>
-    <ThemeProvider theme={theme}>
-    <Typography variant="h1" component="div">
-        Update Task
-      </Typography>
-      <form onSubmit={handleUpdateSubmit}>
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          value={updateData.title}
-          onChange={handleUpdateChange}
-          required
-        />
-        <input
-          type="text"
-          name="description"
-          placeholder="Description"
-          value={updateData.description}
-          onChange={handleUpdateChange}
-          required
-        />
-        <input
-          type="datetime-local"
-          name="dueDate"
-          placeholder="Due Date"
-          value={updateData.dueDate}
-          onChange={handleUpdateChange}
-          required
-        />
-        <button type="submit">Update Task</button>
-      </form>
-    </ThemeProvider>
+      <ThemeProvider theme={theme}>
+      <nav className="navbar">
+          <h1 className="navbar-logo">TaskBuster</h1>
+          <div className="navbar-links">
+            <Link to="/" className="nav-link">Home</Link>
+            <Link to="/profile" className="nav-link">Profile</Link>
+          </div>
+        </nav>
+        <div className='screen'>
+        <Typography variant="h2" component="div">
+          Update Task
+        </Typography>
+
+        {/* Form to update task */}
+        <form onSubmit={handleUpdateSubmit}>
+        <div>
+            <button type="button" onClick={() => handleTagUpdate(currentData.tag.tagId, "Low Priority")}>Low Priority</button>
+            <button type="button" onClick={() => handleTagUpdate(currentData.tag.tagId, "High Priority")}>High Priority</button>
+            <button type="button" onClick={() => handleTagUpdate(currentData.tag.tagId, "Urgent")}>Urgent</button>
+        </div>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <TextField
+                label="Title"
+                name="title"
+                variant="outlined"
+                value={updateData.title}
+                onChange={handleUpdateChange}
+                fullWidth
+                required
+              />
+              <TextField
+                label="Description"
+                name="description"
+                variant="outlined"
+                value={updateData.description}
+                onChange={handleUpdateChange}
+                fullWidth
+                required
+              />
+              <TextField
+                label="Due Date"
+                name="dueDate"
+                type="datetime-local"
+                variant="outlined"
+                value={updateData.dueDate}
+                onChange={handleUpdateChange}
+                fullWidth
+                required
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                size="large"
+                sx={{ mt: 2 }}
+              >
+                Update Task
+              </Button>
+            </Box>
+        </form>
+        </div>
+      </ThemeProvider>
     </div>
   );
 }

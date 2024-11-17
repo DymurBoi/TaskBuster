@@ -86,7 +86,7 @@ const ToDoListLanding = () => {
   };
 
   return (
-    <div className="screen">
+    <div>
       <nav className="navbar">
         <h1 className="navbar-logo">TaskBuster</h1>
         <div className="navbar-links">
@@ -94,7 +94,7 @@ const ToDoListLanding = () => {
           <Link to="/profile" className="nav-link">Profile</Link>
         </div>
       </nav>
-
+    <div className="screen">
       <div className="todo-container">
         <h2 className="header">Your To-Do List</h2>
         <button onClick={() => navigate('/todos/new')} className="button">Add To-Do</button>
@@ -147,6 +147,7 @@ const ToDoListLanding = () => {
           </form>
         )}
       </div>
+    </div>
     </div>
   );
 };

@@ -13,18 +13,24 @@ import { createTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid2';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Tooltip from '@mui/material/Tooltip';
 
 const theme = createTheme({
   typography: {
-    h1: {
+    fontFamily: `'Poppins', sans-serif`,
+    h2: {
       color: 'black',
       textAlign: 'center',  // Center the heading text
-    },
-    button: {
-      color: 'yellow'
     }
-  }
+  },
 });
+
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
   ...theme.typography.body2,
@@ -32,11 +38,16 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: 'center',
   color: theme.palette.text.secondary,
 }));
+
 function TaskView() {
   const { toDoListID } = useParams();
   const [tasks, setTasks] = useState([]);
+  const [confirm, setConfirm] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
   const navigate = useNavigate();
   const token = localStorage.getItem('authToken');
+
+  // Fetch tasks when component mounts or when toDoListID or token changes
   useEffect(() => {
     const fetchTasks = async () => {
       if (!token) {
@@ -56,80 +67,125 @@ function TaskView() {
 
     fetchTasks();
   }, [token, toDoListID]);
-  
-  const deleteTask = (taskId) => {
-    axios.delete(`/api/taskbuster/deleteTask/${taskId}`)
-      .then(() => {
-        setTasks(prevTasks => prevTasks.filter(task => task.taskId !== taskId));
-      })
-      .catch(error => console.error("Error deleting task:", error));
+
+  // Set the selected task and open the confirmation dialog
+  const confirmButton = (id) => {
+    setSelectedTask(id);
+    setConfirm(true);
   };
 
-    const handleCardClick = () => {
-      navigate('/createTask')
-    };
+  // Delete the selected task from the server
+  const deleteTask = (taskId) => {
+    if (!taskId) return;
+
+    axios.delete(`http://localhost:8080/api/taskbuster/deleteTask/${taskId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(() => {
+        // Remove the task from the state after successful deletion
+        setTasks(prevTasks => prevTasks.filter(task => task.taskId !== taskId));
+        setConfirm(false); // Close the confirmation dialog
+      })
+      .catch(error => {
+        console.error("Error deleting task:", error);
+        setConfirm(false); // Close the dialog in case of an error
+      });
+  };
+
+  // Handle task creation navigation
+
   return (
     <div>
-    <ThemeProvider theme={theme}>
-    <nav className="navbar">
-        <h1 className="navbar-logo">TaskBuster</h1>
-        <div className="navbar-links">
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/register" className="nav-link">Register</Link>
-          <Link to="/login" className="nav-link">Login</Link>
-        </div>
+      <ThemeProvider theme={theme}>
+        <nav className="navbar">
+          <h1 className="navbar-logo">TaskBuster</h1>
+          <div className="navbar-links">
+            <Link to="/" className="nav-link">Home</Link>
+            <Link to="/profile" className="nav-link">Profile</Link>
+          </div>
         </nav>
-      <div className='screen'>
-      <Typography variant="h2" sx={{ color: 'black', textAlign: 'center' }}>
-        Task List
-      </Typography>
-      <Grid container spacing={3} justifyContent="center">
-      {/* Wrapping the task list in a container that centers content */}
-      <div className="row">
-        {tasks.map(task => (
-            <Grid item xs={12} sm={6} md={4}>
-              <Item>
-            <Card sx={{ minWidth: 275, maxWidth: 345, margin: "0 auto" }}>
-              <CardContent>
-                <Typography variant="h5" component="div">
-                  {task.title}
-                </Typography>
-                <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>
-                  {task.status} {task.tag ? task.tag.name : 'No Tag'}
-                </Typography>
-                <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>
-                  {new Date(task.dueDate).toLocaleDateString()}
-                </Typography>
-                <Typography variant="body2">
-                  <br />
-                  {task.description}
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Link to={`/taskupdate/${task.taskId}`}>Update Task</Link>
-                <Link to="/readComments" state={{ taskId: task.taskId }}>View Comments</Link>
-                <Button size="small" onClick={() => deleteTask(task.taskId)}>Delete Task</Button>
-              </CardActions>
-            </Card>
-            </Item>
+        <div className='screen'>
+          <Typography variant="h2">
+            Task List
+          </Typography>
+          <Grid container spacing={5} justifyContent="center">
+            {/* Wrapping the task list in a container that centers content */}
+            {tasks.map(task => (
+              <Grid item xs={12} sm={6} md={4} key={task.taskId}>
+                  <Card
+                    sx={{
+                      minWidth: 275, minHeight: 278, maxWidth: 345, margin: "0 auto", cursor: 'pointer',
+                      '&:hover': { boxShadow: 6 }, justifyContent: 'center'
+                    }}
+                  >
+                    <CardContent>
+                      <Typography variant="h5" component="div">
+                        {task.title}
+                      </Typography>
+                      <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>
+                        Status: {task.status}
+                      </Typography>
+                      <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>
+                        {task.tag ? task.tag.name : 'No Tag'}
+                      </Typography>
+                    </CardContent>
+                    <CardActions sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                      <Link to={`/taskdetails`} state={{ taskId: task.taskId }} onClick={(event) => event.stopPropagation()}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{ backgroundColor: '#fdcc01', alignContent:'center' }}
+                      >
+                        View Details
+                        </Button>
+                      </Link>
+                    </CardActions>
+                  </Card>
+              </Grid>
+            ))}
+            <Grid item xs={12} md={6} lg={4}>
+              <Link to='/createTask' state={{ toDoListId: toDoListID}}>
+              <Card sx={{
+                maxWidth: 345, margin: "0 auto", minWidth: 320, minHeight: 278, cursor: 'pointer', '&:hover': { boxShadow: 6 }
+              }}>
+                <CardContent>
+                  <Typography variant="h5" component="div">
+                    Create Task
+                  </Typography>
+                </CardContent>
+              </Card>
+              </Link>
             </Grid>
-        ))}
-        <Grid item xs={12} md={6} lg={4}>
-        <Item>
-        <Card sx={{maxWidth: 345, margin: "0 auto", minWidth: 320,minHeight: 242, cursor: 'pointer', '&:hover': 
-        {boxShadow: 6,},}} onClick={handleCardClick}>
-      <CardContent>
-        <Typography variant="h5" component="div">
-        Create Task
-        </Typography>
-      </CardContent>
-    </Card>
-    </Item>
-    </Grid>
-      </div>
-      </Grid>
-      </div>
-    </ThemeProvider>
+
+            {/* Confirmation Dialog for Task Deletion */}
+            {confirm && (
+              <Dialog
+                open={confirm}
+                onClose={() => setConfirm(false)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+              >
+                <DialogTitle id="alert-dialog-title">
+                  {"Are you sure you want to delete this task?"}
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="alert-dialog-description">
+                    This action cannot be undone.
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => { deleteTask(selectedTask); setConfirm(false); }} color="primary">
+                    Yes
+                  </Button>
+                  <Button onClick={() => setConfirm(false)} color="primary" autoFocus>
+                    No
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            )}
+          </Grid>
+        </div>
+      </ThemeProvider>
     </div>
   );
 }
