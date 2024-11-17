@@ -1,10 +1,41 @@
-// src/components/ToDoListLanding.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import Grid from '@mui/material/Grid2';
+import { styled } from '@mui/material/styles';
+import Paper from '@mui/material/Paper';
 import './css.css';
 
 const API_BASE_URL = "http://localhost:8080/api/user";
+
+const theme = createTheme({
+  typography: {
+    h2: {
+      color: 'black',
+      textAlign: 'center',
+    },
+    h5: {
+      color: '#3f51b5',
+    },
+    body2: {
+      color: '#757575',
+    },
+  },
+});
+
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  textAlign: 'center',
+  color: theme.palette.text.secondary,
+}));
 
 const ToDoListLanding = () => {
   const [todos, setTodos] = useState([]);
@@ -14,7 +45,7 @@ const ToDoListLanding = () => {
   const navigate = useNavigate();
 
   const token = localStorage.getItem('authToken');
-  const userId = localStorage.getItem('loggedInUserId'); // Assuming userId is stored in local storage
+  const userId = localStorage.getItem('loggedInUserId');
 
   useEffect(() => {
     const fetchToDos = async () => {
@@ -22,10 +53,7 @@ const ToDoListLanding = () => {
         console.error("Token is missing");
         return;
       }
-  
-      const userId = localStorage.getItem('loggedInUserId'); // Ensure userId is stored in localStorage after login
-      console.log("Retrieved userId:", userId);
-  
+
       try {
         const response = await axios.get(`${API_BASE_URL}/todos?userId=${userId}`, {
           headers: {
@@ -37,27 +65,14 @@ const ToDoListLanding = () => {
         console.error("Failed to fetch to-do list:", error);
       }
     };
-  
+
     fetchToDos();
   }, [token]);
 
-  const handleViewDetails = (todo) => {
-    setSelectedTodo(todo);
-    setIsEditing(false);
-  };
-
-  const handleEdit = (todo) => {
-    setSelectedTodo(todo);
-    setIsEditing(true);
-    setEditFormData({ title: todo.title, description: todo.description });
-  };
-
   const handleDelete = async (id) => {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/deleteT/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+      await axios.delete(`${API_BASE_URL}/deleteT/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
       });
       setTodos(todos.filter(todo => todo.toDoListID !== id));
     } catch (error) {
@@ -65,88 +80,74 @@ const ToDoListLanding = () => {
     }
   };
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      const updatedData = { ...selectedTodo, ...editFormData };
-      const response = await axios.put(`${API_BASE_URL}/updateT`, updatedData, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        params: { id: selectedTodo.toDoListID }
-      });
-      setTodos(todos.map(todo =>
-        todo.toDoListID === selectedTodo.toDoListID ? { ...todo, ...editFormData } : todo
-      ));
-      setIsEditing(false);
-      setSelectedTodo(null);
-    } catch (error) {
-      console.error("Failed to update to-do:", error);
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('loggedInUserId');
+    navigate('/login'); 
   };
 
   return (
     <div className="screen">
-      <nav className="navbar">
-        <h1 className="navbar-logo">TaskBuster</h1>
-        <div className="navbar-links">
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/profile" className="nav-link">Profile</Link>
-        </div>
-      </nav>
-
-      <div className="todo-container">
-        <h2 className="header">Your To-Do List</h2>
-        <button onClick={() => navigate('/todos/new')} className="button">Add To-Do</button>
-        {todos.length > 0 ? (
-          todos.map(todo => (
-            <div key={todo.toDoListID} className="todo-item" >
-              <h3 onClick={() => navigate(`/taskview/${todo.toDoListID}`)}className="todo-title" >{todo.title}</h3>
-              <h2  className="todo-title">{todo.description}</h2>
-              <button onClick={() => handleEdit(todo)} className="button">Edit</button>
-              <button onClick={() => handleDelete(todo.toDoListID)} className="button">Delete</button>
-            </div>
-          ))
-        ) : (
-          <p className="text-color-black">No to-do items found.</p>
-        )}
-
-        {selectedTodo && !isEditing && (
-          <div className="details-view">
-            <h3 className="text-color-black">To-Do Details</h3>
-            <p className="text-color-black"><strong>Title:</strong> {selectedTodo.title}</p>
-            <p className="text-color-black"><strong>Description:</strong> {selectedTodo.description}</p>
-            <p className="text-color-black"><strong>Status:</strong> {selectedTodo.status}</p>
+      <ThemeProvider theme={theme}>
+        <nav className="navbar">
+          <h1 className="navbar-logo">TaskBuster</h1>
+          <div className="navbar-links">
+            <Link to="/" className="nav-link">Home</Link>
+            <Link to="/profile" className="nav-link">Profile</Link>
+            <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
           </div>
-        )}
+        </nav>
 
-        {isEditing && (
-          <form onSubmit={handleUpdate} className="edit-form">
-            <h3 className="text-color-black">Edit To-Do</h3>
-            <label className="label">
-              Title:
-              <input
-                type="text"
-                value={editFormData.title}
-                onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
-                required
-                className="input"
-              />
-            </label>
-            <label className="label">
-              Description:
-              <textarea
-                value={editFormData.description}
-                onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-                required
-                className="textarea"
-              />
-            </label>
-            <button type="submit" className="button">Save Changes</button>
-            <button type="button" onClick={() => setIsEditing(false)} className="button">Cancel</button>
-          </form>
-        )}
-      </div>
+        <Typography variant="h2" sx={{ marginBottom: '2em' }}>
+          Your To-Do List
+        </Typography>
+
+        <Grid container spacing={3} justifyContent="center">
+          {todos.map(todo => (
+            <Grid item xs={12} sm={6} md={4} key={todo.toDoListID}>
+              <Item>
+                <Card sx={{ minWidth: 275, maxWidth: 345, margin: '0 auto' }}>
+                  <CardContent>
+                    <Typography variant="h5" component="div">
+                      {todo.title}
+                    </Typography>
+                    <Typography sx={{ mb: 1.5 }}>
+                      {todo.description}
+                    </Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Button size="small" onClick={() => navigate(`/taskview/${todo.toDoListID}`)}>View</Button>
+                    <Button size="small" onClick={() => setSelectedTodo(todo)}>Edit</Button>
+                    <Button size="small" onClick={() => handleDelete(todo.toDoListID)}>Delete</Button>
+                  </CardActions>
+                </Card>
+              </Item>
+            </Grid>
+          ))}
+
+          <Grid item xs={12} sm={6} md={4}>
+            <Item>
+              <Card
+                sx={{
+                  minWidth: 275,
+                  maxWidth: 345,
+                  margin: '0 auto',
+                  minHeight: 200,
+                  cursor: 'pointer',
+                  '&:hover': { boxShadow: 6 },
+                }}
+                onClick={() => navigate('/todos/new')}
+              >
+                <CardContent>
+                  <Typography variant="h5" component="div">
+                    Add New To-Do
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Item>
+          </Grid>
+        </Grid>
+      </ThemeProvider>
     </div>
   );
 };
