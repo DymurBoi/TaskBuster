@@ -10,6 +10,11 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid2';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import './css.css';
 
 const API_BASE_URL = "http://localhost:8080/api/user";
@@ -40,7 +45,8 @@ const Item = styled(Paper)(({ theme }) => ({
 const ToDoListLanding = () => {
   const [todos, setTodos] = useState([]);
   const [selectedTodo, setSelectedTodo] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmUpdate, setConfirmUpdate] = useState(false);
   const [editFormData, setEditFormData] = useState({ title: '', description: '' });
   const navigate = useNavigate();
 
@@ -75,8 +81,38 @@ const ToDoListLanding = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTodos(todos.filter(todo => todo.toDoListID !== id));
+      setConfirmDelete(false);
     } catch (error) {
       console.error("Failed to delete to-do:", error);
+      setConfirmDelete(false);
+    }
+  };
+
+  const confirmDeleteDialog = (todo) => {
+    setSelectedTodo(todo);
+    setConfirmDelete(true);
+  };
+
+  const confirmUpdateDialog = (todo) => {
+    setSelectedTodo(todo);
+    setEditFormData({ title: todo.title, description: todo.description });
+    setConfirmUpdate(true);
+  };
+
+  const handleUpdate = async () => {
+    try {
+      await axios.put(`${API_BASE_URL}/updateT/${selectedTodo.toDoListID}`, editFormData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) =>
+          todo.toDoListID === selectedTodo.toDoListID ? { ...todo, ...editFormData } : todo
+        )
+      );
+      setConfirmUpdate(false);
+    } catch (error) {
+      console.error("Failed to update to-do:", error);
+      setConfirmUpdate(false);
     }
   };
 
@@ -108,45 +144,79 @@ const ToDoListLanding = () => {
               <Item>
                 <Card sx={{ minWidth: 275, maxWidth: 345, margin: '0 auto' }}>
                   <CardContent>
-                    <Typography variant="h5" component="div">
-                      {todo.title}
-                    </Typography>
-                    <Typography sx={{ mb: 1.5 }}>
-                      {todo.description}
-                    </Typography>
+                    <Typography variant="h5">{todo.title}</Typography>
+                    <Typography variant="body2">{todo.description}</Typography>
                   </CardContent>
                   <CardActions>
-                    <Button size="small" onClick={() => navigate(`/taskview/${todo.toDoListID}`)}>View</Button>
-                    <Button size="small" onClick={() => setSelectedTodo(todo)}>Edit</Button>
-                    <Button size="small" onClick={() => handleDelete(todo.toDoListID)}>Delete</Button>
+                    <Button size="small" onClick={() => confirmUpdateDialog(todo)}>Update</Button>
+                    <Button size="small" color="error" onClick={() => confirmDeleteDialog(todo)}>Delete</Button>
                   </CardActions>
                 </Card>
               </Item>
             </Grid>
           ))}
-
-          <Grid item xs={12} sm={6} md={4}>
-            <Item>
-              <Card
-                sx={{
-                  minWidth: 275,
-                  maxWidth: 345,
-                  margin: '0 auto',
-                  minHeight: 200,
-                  cursor: 'pointer',
-                  '&:hover': { boxShadow: 6 },
-                }}
-                onClick={() => navigate('/todos/new')}
-              >
-                <CardContent>
-                  <Typography variant="h5" component="div">
-                    Add New To-Do
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Item>
-          </Grid>
         </Grid>
+
+        {/* Delete Confirmation Dialog */}
+        {confirmDelete && (
+          <Dialog
+            open={confirmDelete}
+            onClose={() => setConfirmDelete(false)}
+          >
+            <DialogTitle>Are you sure you want to delete this to-do?</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                This action cannot be undone.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => handleDelete(selectedTodo.toDoListID)} color="primary">
+                Yes
+              </Button>
+              <Button onClick={() => setConfirmDelete(false)} color="primary" autoFocus>
+                No
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
+
+        {/* Update Confirmation Dialog */}
+        {confirmUpdate && (
+          <Dialog
+            open={confirmUpdate}
+            onClose={() => setConfirmUpdate(false)}
+          >
+            <DialogTitle>Update To-Do</DialogTitle>
+            <DialogContent>
+              <TextField
+                label="Title"
+                fullWidth
+                margin="normal"
+                value={editFormData.title}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, title: e.target.value })
+                }
+              />
+              <TextField
+                label="Description"
+                fullWidth
+                margin="normal"
+                value={editFormData.description}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, description: e.target.value })
+                }
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleUpdate} color="primary">
+                Save
+              </Button>
+              <Button onClick={() => setConfirmUpdate(false)} color="primary" autoFocus>
+                Cancel
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
       </ThemeProvider>
     </div>
   );
