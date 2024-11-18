@@ -102,14 +102,16 @@ const Login = ({ onLogin }) => {
           <form onSubmit={handleLogin}>
             <Box sx={{pr:9}}>
             <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-            <TextField
+              <InputLabel htmlFor="email">Email</InputLabel>
+              <OutlinedInput
+              id="email"
               type="email"
-              placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              label="Email"
+              sx={{ minWidth: 300 }}
               required
-              sx={{minWidth:300}}
-            />
+              />
             </FormControl>
             <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
           <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
