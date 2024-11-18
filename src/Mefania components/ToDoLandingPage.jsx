@@ -142,7 +142,7 @@ const ToDoListLanding = () => {
           <Grid xs={12} sm={6} md={4} key={todo.toDoListID}>
             <Card sx={{ minWidth: 275, maxWidth: 345, margin: '0 auto' }}>
               <CardContent>
-                <Typography variant="h5">{todo.title}</Typography>
+                <Typography onClick={() => navigate(`/taskview/${todo.toDoListID}`)}variant="h5">{todo.title}</Typography>
                 <Typography variant="body2">{todo.description}</Typography>
               </CardContent>
               <CardActions>
