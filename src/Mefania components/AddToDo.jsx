@@ -1,7 +1,7 @@
 // src/components/AddToDo.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './css.css';
 
 const API_BASE_URL = "http://localhost:8080/api/user";
@@ -10,6 +10,7 @@ const AddToDo = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [userId, setUserId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Retrieve userId and token from localStorage on component mount
@@ -42,6 +43,8 @@ const AddToDo = () => {
     } catch (error) {
       console.error("Failed to add to-do item:", error);
       alert("Failed to add to-do item");
+    }finally {
+      navigate('/todos');
     }
   };
 
@@ -54,9 +57,9 @@ const AddToDo = () => {
   return (
     <div className="screen">
       <nav className="navbar">
-        <h1 className="navbar-logo">TaskBuster</h1>
+      <Link to="/todos" className="nav-link"><h1 className="navbar-logo">TaskBuster</h1></Link>
         <div className="navbar-links">
-          <Link to="/" className="nav-link">Home</Link>
+          <Link to="/todos" className="nav-link">To Do List</Link>
           <Link to="/profile" className="nav-link">Profile</Link>
           <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
         </div>

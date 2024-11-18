@@ -1,13 +1,19 @@
-// src/components/UserProfile.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import './css.css';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [editing, setEditing] = useState(false);
   const [password, setPassword] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(false); // For confirmation dialog
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -55,8 +61,8 @@ const UserProfile = () => {
   };
 
   const handleDeleteUser = async () => {
+    const token = localStorage.getItem('authToken');
     try {
-      const token = localStorage.getItem('authToken');
       await axios.delete(`http://localhost:8080/api/user/delete/${user.userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -68,31 +74,27 @@ const UserProfile = () => {
       console.error('Failed to delete user:', error);
       alert('Failed to delete user');
     }
+    setConfirmDelete(false); // Close the confirmation dialog
   };
-
-  const handleViewToDoList = () => {
-    navigate('/todos');
-  };
-
-  const handleAddToDoList = () => {
-    navigate('/todos/new');
-  };
-
-  if (!user) return <p>Loading...</p>;
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('loggedInUserId');
-    navigate('/login'); 
+    navigate('/login');
   };
+
+  if (!user) return <p>Loading...</p>;
+
   return (
     <div className="screen">
       <nav className="navbar">
-        <h1 className="navbar-logo">TaskBuster</h1>
+        <Link to="/todos" className="nav-link">
+          <h1 className="navbar-logo">TaskBuster</h1>
+        </Link>
         <div className="navbar-links">
-        <Link to="/" className="nav-link">Home</Link>
-        <Link to="/profile" className="nav-link">Profile</Link>
-        <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
+          <Link to="/todos" className="nav-link">To Do List</Link>
+          <Link to="/profile" className="nav-link">Profile</Link>
+          <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
         </div>
       </nav>
 
@@ -135,17 +137,31 @@ const UserProfile = () => {
             <div>
               <p className="p">Name: {user.name}</p>
               <p className="p">Email: {user.email}</p>
-              <p className="p">Date Joined: {new Date(user.dateJoined).toLocaleDateString()}</p>
+              <p className="p">Date Joined: {new Date(user.createdAt).toLocaleDateString()}</p>
               <button onClick={() => setEditing(true)} className="button">Edit</button>
-              <button onClick={handleDeleteUser} className="button">Delete Account</button>
+              <button onClick={() => setConfirmDelete(true)} className="logout-button">Delete Account</button>
             </div>
           )}
-          <div style={{ marginTop: '20px' }}>
-            <button onClick={handleViewToDoList} className="button">View To-Do List</button>
-            <button onClick={handleAddToDoList} className="button">Add To-Do</button>
-          </div>
         </div>
       </div>
+
+      {/* Confirmation Dialog for Deleting User */}
+      <Dialog open={confirmDelete} onClose={() => setConfirmDelete(false)}>
+        <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteUser} color="primary">
+            Yes
+          </Button>
+          <Button onClick={() => setConfirmDelete(false)} color="secondary">
+            No
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

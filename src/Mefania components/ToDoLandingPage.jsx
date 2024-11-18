@@ -126,9 +126,9 @@ const ToDoListLanding = () => {
     <div className="screen">
       <ThemeProvider theme={theme}>
         <nav className="navbar">
-          <h1 className="navbar-logo">TaskBuster</h1>
+        <Link to="/todos" className="nav-link"><h1 className="navbar-logo">TaskBuster</h1></Link>
           <div className="navbar-links">
-            <Link to="/" className="nav-link">Home</Link>
+            <Link to="/todos" className="nav-link">To Do List</Link>
             <Link to="/profile" className="nav-link">Profile</Link>
             <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
           </div>
@@ -140,7 +140,7 @@ const ToDoListLanding = () => {
 
         <Grid container spacing={3} justifyContent="center">
           {todos.map(todo => (
-            <Grid item xs={12} sm={6} md={4} key={todo.toDoListID}>
+            <Grid xs={12} sm={6} md={4} key={todo.toDoListID}>
               <Item>
                 <Card sx={{ minWidth: 275, maxWidth: 345, margin: '0 auto' }}>
                   <CardContent>
@@ -155,6 +155,28 @@ const ToDoListLanding = () => {
               </Item>
             </Grid>
           ))}
+          <Grid xs={12} sm={6} md={4}>
+            <Item>
+              <Card
+                sx={{
+                  minWidth: 275,
+                  maxWidth: 345,
+                  margin: '0 auto',
+                  minHeight: 200,
+                  cursor: 'pointer',
+                  '&:hover': { boxShadow: 6 },
+                }}
+                onClick={() => navigate('/todos/new')}
+              >
+                <CardContent>
+                  <Typography variant="h5" component="div">
+                    Add New To-Do
+                  </Typography>
+                  <h1>+</h1>
+                </CardContent>
+              </Card>
+            </Item>
+          </Grid>
         </Grid>
 
         {/* Delete Confirmation Dialog */}
