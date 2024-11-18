@@ -4,7 +4,17 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { TextField } from '@mui/material';
+import { TextField,Box } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import Input from '@mui/material/Input';
+import FilledInput from '@mui/material/FilledInput';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import InputAdornment from '@mui/material/InputAdornment';
+import FormHelperText from '@mui/material/FormHelperText';
+import FormControl from '@mui/material/FormControl';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import './css.css';
 
 const Login = ({ onLogin }) => {
@@ -13,6 +23,16 @@ const Login = ({ onLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const navigate = useNavigate();
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
+  const handleMouseUpPassword = (event) => {
+    event.preventDefault();
+  };
 
   const handlePasswordChange = (e) => {
     const value = e.target.value;
@@ -80,29 +100,44 @@ const Login = ({ onLogin }) => {
         <div className="login-container">
           <h2 className="header">Login</h2>
           <form onSubmit={handleLogin}>
-            <input
+            <Box sx={{pr:5}}>
+            <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
+            <TextField
               type="email"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="input"
+              sx={{minWidth:300}}
             />
-            <div className="password-container">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Password"
-                value={password}
-                onChange={handlePasswordChange}
-                required
-                className="input"
-              />
-              <FontAwesomeIcon
-                icon={showPassword ? faEye : faEyeSlash}
-                className="eye-icon"
-                onClick={togglePasswordVisibility}
-              />
-            </div>
+            </FormControl>
+            <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
+          <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+          <OutlinedInput
+            sx={{minWidth:300}}
+            id="outlined-adornment-password"
+            value={password}
+            onChange={handlePasswordChange}
+            type={showPassword ? 'text' : 'password'}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label={
+                    showPassword ? 'hide the password' : 'display the password'
+                  }
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  onMouseUp={handleMouseUpPassword}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            }
+            label="Password"
+          />
+        </FormControl>
+            </Box>
             {passwordError && <p className="error">{passwordError}</p>}
             <button type="submit" className="button">
               Login
