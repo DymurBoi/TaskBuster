@@ -156,9 +156,6 @@ function TaskUpdate() {
                 onChange={handleUpdateChange}
                 fullWidth
                 required
-                InputLabelProps={{
-                  shrink: true,
-                }}
               />
               <Button
                 type="submit"

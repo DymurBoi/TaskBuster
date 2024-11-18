@@ -22,10 +22,11 @@
     align-items: center;
     min-width: 100vw;
     min-height: 100vh;
-    background-color: #f8f8f8;
 /* Space for the navbar */
 }
 #root {
     margin: 0 auto;
     text-align: center;
+    min-width: 100vw;
+    min-height: 100vh;
 }

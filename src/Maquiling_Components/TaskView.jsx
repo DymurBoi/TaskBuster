@@ -13,13 +13,8 @@ import { createTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid2';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Tooltip from '@mui/material/Tooltip';
+import AddIcon from '@mui/icons-material/Add';
+import { Container,IconButton } from '@mui/material';
 
 const theme = createTheme({
   typography: {
@@ -104,28 +99,27 @@ function TaskView() {
             <Link to="/profile" className="nav-link">Profile</Link>
           </div>
         </nav>
-        <div className='screen'>
-          <Typography variant="h2">
+        <Container fixed >
+          <Typography variant="h2" sx={{mb:2}}>
             Task List
           </Typography>
-          <Grid container spacing={5} justifyContent="center">
-            {/* Wrapping the task list in a container that centers content */}
+          <Grid container spacing={2} justifyContent="left">
             {tasks.map(task => (
-              <Grid item xs={12} sm={6} md={4} key={task.taskId}>
+              <Grid xs={10} sm={6} md={4} key={task.taskId}>
                   <Card
                     sx={{
                       minWidth: 275, minHeight: 278, maxWidth: 345, margin: "0 auto", cursor: 'pointer',
                       '&:hover': { boxShadow: 6 }, justifyContent: 'center'
                     }}
                   >
-                    <CardContent>
-                      <Typography variant="h5" component="div">
+                    <CardContent sx={{mb:5}}>
+                      <Typography variant="h5" component="div" sx={{mb: 2}}>
                         {task.title}
                       </Typography>
-                      <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>
+                      <Typography sx={{ color: 'text.secondary', mb: 2 }}>
                         Status: {task.status}
                       </Typography>
-                      <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>
+                      <Typography sx={{ color: 'text.secondary'}}>
                         {task.tag ? task.tag.name : 'No Tag'}
                       </Typography>
                     </CardContent>
@@ -134,7 +128,7 @@ function TaskView() {
                       <Button
                         variant="contained"
                         size="small"
-                        sx={{ backgroundColor: '#fdcc01', alignContent:'center' }}
+                        sx={{ backgroundColor: '#fdcc01', alignContent:'center', mr:15 }}
                       >
                         View Details
                         </Button>
@@ -143,48 +137,22 @@ function TaskView() {
                   </Card>
               </Grid>
             ))}
-            <Grid item xs={12} md={6} lg={4}>
+            <Grid xs={12} md={6} lg={4}>
               <Link to='/createTask' state={{ toDoListId: toDoListID}}>
               <Card sx={{
-                maxWidth: 345, margin: "0 auto", minWidth: 320, minHeight: 278, cursor: 'pointer', '&:hover': { boxShadow: 6 }
+                maxWidth: 340, margin: "0 auto", minWidth: 275, minHeight: 278, cursor: 'pointer', '&:hover': { boxShadow: 6 }
               }}>
                 <CardContent>
-                  <Typography variant="h5" component="div">
+                  <Typography variant="h5" component="div" sx={{mb:8}}>
                     Create Task
                   </Typography>
+                  <IconButton sx={{'&:hover':{backgroundColor: 'transparent'}}}><AddIcon fontSize='large'/></IconButton>
                 </CardContent>
               </Card>
               </Link>
             </Grid>
-
-            {/* Confirmation Dialog for Task Deletion */}
-            {confirm && (
-              <Dialog
-                open={confirm}
-                onClose={() => setConfirm(false)}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-              >
-                <DialogTitle id="alert-dialog-title">
-                  {"Are you sure you want to delete this task?"}
-                </DialogTitle>
-                <DialogContent>
-                  <DialogContentText id="alert-dialog-description">
-                    This action cannot be undone.
-                  </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={() => { deleteTask(selectedTask); setConfirm(false); }} color="primary">
-                    Yes
-                  </Button>
-                  <Button onClick={() => setConfirm(false)} color="primary" autoFocus>
-                    No
-                  </Button>
-                </DialogActions>
-              </Dialog>
-            )}
           </Grid>
-        </div>
+          </Container>
       </ThemeProvider>
     </div>
   );
