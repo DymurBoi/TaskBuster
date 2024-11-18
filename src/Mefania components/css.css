@@ -199,3 +199,25 @@ button {
   .textarea {
     resize: vertical;
   }
+
+  .password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 95%;
+    margin: 0 auto; /* Centers the password container */
+    margin-top: 10px;
+  }
+  
+  .password-container .eye-icon {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    color: #555;
+  }
+  
+  .password-container .input {
+    width: 100%;
+    padding-right: 40px; /* Padding to prevent overlap with the eye icon */
+  }
