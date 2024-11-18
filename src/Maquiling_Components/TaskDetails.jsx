@@ -167,7 +167,7 @@ const postComment = (comment) => {
       <nav className="navbar">
           <Button
           startIcon={<ChecklistIcon />}
-          sx={{width:'10%',ml:4,color:'white'}}
+          sx={{width:'10%',ml:4,color:'white','& .MuiSvgIcon-root': { fontSize: 40 }}}
           ><h1 className="navbar-logo">TaskBuster</h1>
           </Button>
           <div className="navbar-links">
