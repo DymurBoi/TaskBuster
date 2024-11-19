@@ -1,0 +1,11 @@
+# pack-refs with: peeled fully-peeled sorted 
+996d89b94ee0394424dbc03981d494c411e931cc refs/remotes/origin/Admin-user
+b018823f66e602241d4ee60b4ce0f9bd67f3348c refs/remotes/origin/Login
+dc957e9f24b95cc328af7c415454e99e28f36b57 refs/remotes/origin/Mefania
+1027f46f2d811cb57d4f370a28518c2335cc7039 refs/remotes/origin/Register
+3023cfcb9c7ed9fb9077368ac633c345339950a0 refs/remotes/origin/Task
+27a9a9c0f5feeefa9ca497440eb122e26ef1f036 refs/remotes/origin/basic-frontend-to-backend-connection
+6765e8228d962b4bc0d900fec680b3bf371a64d1 refs/remotes/origin/main
+7e6d61a8b04da0e25485495e2a46e99667a20d14 refs/remotes/origin/task-and-todolist
+cf401055682d0fab2b175f1835a87e6feb27a4b8 refs/remotes/origin/task-ui
+7e6d61a8b04da0e25485495e2a46e99667a20d14 refs/remotes/origin/todo-list-design
