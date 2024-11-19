@@ -99,6 +99,12 @@ function TaskView() {
         setConfirm(false); // Close the dialog in case of an error
       });
   };
+  
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('loggedInUserId');
+    navigate('/login');
+  };
 
   return (
     <div>
@@ -116,12 +122,9 @@ function TaskView() {
             <h1 className="navbar-logo">TaskBuster</h1>
           </Button>
           <div className="navbar-links">
-            <Link to="/" className="nav-link">
-              Home
-            </Link>
-            <Link to="/profile" className="nav-link">
-              Profile
-            </Link>
+          <Link to="/todos" className="nav-link">Todos</Link>
+            <Link to="/profile" className="nav-link">Profile</Link>
+            <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
           </div>
         </nav>
         <Container fixed sx={{ mb: 15 }}>

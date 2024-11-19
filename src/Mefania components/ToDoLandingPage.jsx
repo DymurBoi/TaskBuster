@@ -14,6 +14,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid2';
 import './css.css';
+import ChecklistIcon from '@mui/icons-material/Checklist';
 
 const API_BASE_URL = "http://localhost:8080/api/user";
 
@@ -122,16 +123,18 @@ const ToDoListLanding = () => {
 
   return (
     <div className="screen">
-      <nav className="navbar">
-        <Link to="/todos" className="nav-link">
-          <h1 className="navbar-logo">TaskBuster</h1>
-        </Link>
-        <div className="navbar-links">
-          <Link to="/todos" className="nav-link">To Do List</Link>
-          <Link to="/profile" className="nav-link">Profile</Link>
-          <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
-        </div>
-      </nav>
+       <nav className="navbar">
+          <Button
+          startIcon={<ChecklistIcon />}
+          sx={{width:'10%',ml:4,color:'white','& .MuiSvgIcon-root': { fontSize: 40 }}}
+          ><h1 className="navbar-logo">TaskBuster</h1>
+          </Button>
+          <div className="navbar-links">
+            <Link to="/todos" className="nav-link">Todos</Link>
+            <Link to="/profile" className="nav-link">Profile</Link>
+            <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
+          </div>
+        </nav>
 
       <Typography variant="h2" sx={{ marginBottom: '2em', textAlign: 'center' }}>
         Your To-Do List

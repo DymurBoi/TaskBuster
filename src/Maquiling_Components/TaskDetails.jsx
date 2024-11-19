@@ -161,6 +161,12 @@ const postComment = (comment) => {
         setConfirm(false); // Close the dialog in case of an error
       });
   };
+  
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('loggedInUserId');
+    navigate('/login');
+  };
   return (
     <div>
       <ThemeProvider theme={theme}>
@@ -173,6 +179,7 @@ const postComment = (comment) => {
           <div className="navbar-links">
             <Link to="/" className="nav-link">Home</Link>
             <Link to="/profile" className="nav-link">Profile</Link>
+            <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
           </div>
         </nav>
 

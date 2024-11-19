@@ -10,6 +10,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
+import ChecklistIcon from '@mui/icons-material/Checklist';
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -89,16 +90,18 @@ const UserProfile = () => {
 
   return (
     <div className="screen">
-      <nav className="navbar">
-        <Link to="/todos" className="nav-link">
-          <h1 className="navbar-logo">TaskBuster</h1>
-        </Link>
-        <div className="navbar-links">
-          <Link to="/todos" className="nav-link">To Do List</Link>
-          <Link to="/profile" className="nav-link">Profile</Link>
-          <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
-        </div>
-      </nav>
+       <nav className="navbar">
+          <Button
+          startIcon={<ChecklistIcon />}
+          sx={{width:'10%',ml:4,color:'white','& .MuiSvgIcon-root': { fontSize: 40 }}}
+          ><h1 className="navbar-logo">TaskBuster</h1>
+          </Button>
+          <div className="navbar-links">
+            <Link to="/todos" className="nav-link">Todos</Link>
+            <Link to="/profile" className="nav-link">Profile</Link>
+            <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
+          </div>
+        </nav>
 
       <div className="screen">
         <div className="profile-container">
