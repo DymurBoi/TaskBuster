@@ -6,7 +6,6 @@ import { Box, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import Button from '@mui/material/Button';
-import './css.css';
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
@@ -15,7 +14,22 @@ const Register = () => {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    if (name === 'password') {
+      // Password validation regex
+      const passwordRegex = /^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+      if (!passwordRegex.test(value)) {
+        setPasswordError('Password must be at least 8 characters and contain at least one special character.');
+      } else {
+        setPasswordError('');
+      }
+    }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prevState) => !prevState);
   };
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -57,9 +71,15 @@ const Register = () => {
           ><h1 className="navbar-logo">TaskBuster</h1>
           </Button>
         <div className="navbar-links">
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/register" className="nav-link">Register</Link>
-          <Link to="/login" className="nav-link">Login</Link>
+          <Link to="/" className="nav-link">
+            Home
+          </Link>
+          <Link to="/register" className="nav-link">
+            Register
+          </Link>
+          <Link to="/login" className="nav-link">
+            Login
+          </Link>
         </div>
       </nav>
       <div className="screen">

@@ -112,14 +112,21 @@ function TaskUpdate() {
     updateTag(tagId, priority);
   };
 
+  
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('loggedInUserId');
+    navigate('/login');
+  };
   return (
     <div>
       <ThemeProvider theme={theme}>
         <nav className="navbar">
           <h1 className="navbar-logo">TaskBuster</h1>
           <div className="navbar-links">
-            <Link to="/" className="nav-link">Home</Link>
+          <Link to="/todos" className="nav-link">Todos</Link>
             <Link to="/profile" className="nav-link">Profile</Link>
+            <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
           </div>
         </nav>
         <div className='screen'>

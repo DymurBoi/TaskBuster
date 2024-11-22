@@ -45,6 +45,8 @@ const AddToDo = () => {
     } catch (error) {
       console.error("Failed to add to-do item:", error);
       alert("Failed to add to-do item");
+    }finally {
+      navigate('/todos');
     }
   };
 

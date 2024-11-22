@@ -106,29 +106,19 @@ function TaskCreate() {
       }));
     }
   };
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('loggedInUserId');
-    navigate('/login');
-  }
 
   return (
     <ThemeProvider theme={theme}>
       {/* Navbar */}
       <nav className="navbar">
-          <Button
-          startIcon={<ChecklistIcon />}
-          sx={{width:'10%',ml:4,color:'white','& .MuiSvgIcon-root': { fontSize: 41 }}}
-          ><h1 className="navbar-logo">TaskBuster</h1>
-          </Button>
-          <div className="navbar-links">
-            <Link to="/todos" className="nav-link">Todos</Link>
-            <Link to="/profile" className="nav-link">Profile</Link>
-            <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
-          </div>
-        </nav>
-
-      <div className="screen">
+        <h1 className="navbar-logo">TaskBuster</h1>
+        <div className="navbar-links">
+          <Link to="/" className="nav-link">Home</Link>
+          <Link to="/register" className="nav-link">Register</Link>
+          <Link to="/login" className="nav-link">Login</Link>
+        </div>
+      </nav>
+      <div className='screen'>
         <Container maxWidth="sm" sx={{ mt: 4 }}>
           <Typography variant="h2" gutterBottom>
             Create a Task

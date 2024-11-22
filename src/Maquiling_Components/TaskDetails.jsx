@@ -34,6 +34,10 @@ const theme = createTheme({
     h5: {
       color: 'black',
       textAlign: 'left',
+    },
+    body1:{
+      color: 'black',
+      textAlign: 'left',
     }
   },
 });
@@ -164,41 +168,30 @@ function TaskUpdate() {
     }));
   };
 
-  const confirmDeleteTask = () => {
-    axios.delete(`http://localhost:8080/api/taskbuster/deleteTask/${selectedTask}`, authHeaders())
-      .then(() => {
-        navigate(`/taskview/${currentData.toDoList.toDoListID}`);
-        setConfirm(false);
-      })
-      .catch(error => {
-        console.error('Error deleting task:', error);
-        setConfirm(false);
-      });
-  };
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('loggedInUserId');
     navigate('/login');
   };
+  const confirmDeleteTask = () => {
+    if (selectedTask) {
+      axios.delete(`/api/taskbuster/deleteTask/${selectedTask.taskId}`, authHeaders())
+        .then(() => {
+          // After deleting, navigate the user to the correct page
+          navigate(`/taskview/${currentData.toDoList.toDoListID}`); // Adjust as needed
+          setConfirm(false); // Close the confirmation dialog
+        })
+        .catch(error => {
+          console.error('Error deleting task:', error);
+          setConfirm(false); // Close the dialog if an error occurs
+        });
+    }
+  };
 
   return (
     <div>
       <ThemeProvider theme={theme}>
-        <nav className="navbar">
-          <Button
-            startIcon={<ChecklistIcon />}
-            sx={{ width: '10%', ml: 4, color: 'white', '& .MuiSvgIcon-root': { fontSize: 41 } }}
-          >
-            <h1 className="navbar-logo">TaskBuster</h1>
-          </Button>
-          <div className="navbar-links">
-            <Link to="/todos" className="nav-link">Todos</Link>
-            <Link to="/profile" className="nav-link">Profile</Link>
-            <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
-          </div>
-        </nav>
-
         <Container fixed sx={{ padding: 0 }}>
           <Typography variant="h3" component="div" sx={{ mb: 2 }}>
             Task Details
@@ -230,7 +223,8 @@ function TaskUpdate() {
                 <Tooltip title="Delete Task">
                   <Button sx={{ width: '150px' }} variant="outlined" color="error" startIcon={<DeleteIcon />} fullWidth onClick={(event) => {
                     event.stopPropagation();
-                    setConfirm(true);
+                    setSelectedTask(currentData); // Set selectedTask before confirming delete
+                    setConfirm(true); // Show the delete confirmation dialog
                   }}>
                     Delete Task
                   </Button>
@@ -238,59 +232,17 @@ function TaskUpdate() {
 
                 {/* Task Status Buttons */}
                 {currentData.status === 'Pending' ? (
-                  <Button
-                    sx={{ width: '150px' }}
-                    variant="outlined"
-                    color="success"
-                    startIcon={<CheckCircleOutlineIcon />}
-                    fullWidth
-                    onClick={() => updateTaskStatus('Completed')}
-                  >
+                  <Button sx={{ width: '150px' }} variant="outlined" color="success" startIcon={<CheckCircleOutlineIcon />} fullWidth onClick={() => updateTaskStatus('Completed')}>
                     Mark as Completed
                   </Button>
                 ) : (
-                  <Button
-                    sx={{ width: '150px' }}
-                    variant="outlined"
-                    color="warning"
-                    startIcon={<ReplayIcon />}
-                    fullWidth
-                    onClick={() => updateTaskStatus('Pending')}
-                  >
+                  <Button sx={{ width: '150px' }} variant="outlined" color="warning" startIcon={<ReplayIcon />} fullWidth onClick={() => updateTaskStatus('Pending')}>
                     Mark as Pending
                   </Button>
                 )}
               </Box>
             </Box>
           </Paper>
-
-          {/* Comments Section */}
-          <Typography variant="h5">Comments</Typography>
-          <Box sx={{ width: '100%', marginBottom: '20px' }}>
-            {filteredComments.map((comment) => (
-              <Box key={comment.commentId} sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                <Typography variant="body1">{comment.commentText}</Typography>
-                <Button color="error" onClick={() => deleteComment(comment.commentId)}>
-                  <DeleteIcon />
-                </Button>
-              </Box>
-            ))}
-          </Box>
-
-          <form onSubmit={handleSubmit}>
-            <TextField
-              fullWidth
-              label="Add a Comment"
-              name="commentText"
-              value={newComment.commentText}
-              onChange={handleChange}
-              variant="outlined"
-              sx={{ marginBottom: '20px' }}
-            />
-            <Button variant="contained" color="primary" type="submit" sx={{ width: '100%' }}>
-              Add Comment
-            </Button>
-          </form>
 
           {/* Delete Confirmation Dialog */}
           <Dialog open={confirm} onClose={() => setConfirm(false)}>

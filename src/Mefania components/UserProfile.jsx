@@ -4,12 +4,13 @@ import axios from 'axios';
 import { Box, Button, TextField, Paper, Typography, Container } from '@mui/material';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 
-import './css.css';
+
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [editing, setEditing] = useState(false);
   const [password, setPassword] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(false); // For confirmation dialog
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,8 +58,8 @@ const UserProfile = () => {
   };
 
   const handleDeleteUser = async () => {
+    const token = localStorage.getItem('authToken');
     try {
-      const token = localStorage.getItem('authToken');
       await axios.delete(`http://localhost:8080/api/user/delete/${user.userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -70,15 +71,9 @@ const UserProfile = () => {
       console.error('Failed to delete user:', error);
       alert('Failed to delete user');
     }
+    setConfirmDelete(false); // Close the confirmation dialog
   };
 
-  const handleViewToDoList = () => {
-    navigate('/todos');
-  };
-
-  const handleAddToDoList = () => {
-    navigate('/todos/new');
-  };
 
   if (!user) return <p>Loading...</p>;
   const handleLogout = () => {
