@@ -12,6 +12,7 @@ import ToDoLandingPage from './Mefania components/ToDoLandingPage';
 import AddToDo from './Mefania components/AddToDo';
 import TaskDetails from './Maquiling_Components/TaskDetails';
 import CreateComment from './Maquiling_Components/CreateComment'
+import CommentUpdate from './Maquiling_Components/CommentUpdate';
 const RoutesConfig = ({ loggedInUserId, handleLogin }) => (
   <Routes>
   <Route path="/" element={<Navigate to="/register" />} />
@@ -26,7 +27,8 @@ const RoutesConfig = ({ loggedInUserId, handleLogin }) => (
     <Route path="/readComments" element={<CommentView/>}/>
     <Route path="/createTask" element={<TaskCreate/>}/>
     <Route path="/taskdetails/" element={<TaskDetails/>}/>
-    <Route path="/createComment" element={<CreateComment/>}/>
+    <Route path="/commentUpdate/" element={<CommentUpdate/>}/>
+    
   </Routes>
 );
 

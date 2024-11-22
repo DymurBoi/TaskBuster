@@ -1,7 +1,9 @@
 // src/components/AddToDo.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Box, FormControl, InputLabel, OutlinedInput, Paper, Button, Container } from '@mui/material';
+import ChecklistIcon from '@mui/icons-material/Checklist';
 import './css.css';
 
 const API_BASE_URL = "http://localhost:8080/api/user";
@@ -10,6 +12,7 @@ const AddToDo = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [userId, setUserId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Retrieve userId and token from localStorage on component mount
@@ -52,35 +55,61 @@ const AddToDo = () => {
   };
 
   return (
-    <div className="screen">
+    <div>
       <nav className="navbar">
-        <h1 className="navbar-logo">TaskBuster</h1>
-        <div className="navbar-links">
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/profile" className="nav-link">Profile</Link>
-          <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
-        </div>
-      </nav>
-
-      <div>
-        <div className="addtodo-container">
+          <Button
+          startIcon={<ChecklistIcon />}
+          sx={{width:'10%',ml:4,color:'white','& .MuiSvgIcon-root': { fontSize: 40 }}}
+          ><h1 className="navbar-logo">TaskBuster</h1>
+          </Button>
+          <div className="navbar-links">
+            <Link to="/todos" className="nav-link">Todos</Link>
+            <Link to="/profile" className="nav-link">Profile</Link>
+            <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
+          </div>
+        </nav>
+    
+      <Container maxWidth="sm" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <Paper elevation={3} sx={{ padding: 4, width: '100%', maxWidth: 500, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <h2 className="header">Add a New To-Do</h2>
-          <input
-            type="text"
-            placeholder="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="input"
-          />
-          <textarea
-            placeholder="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="textarea"
-          />
-          <button onClick={handleAddToDo} className="button">Add To-Do</button>
-        </div>
-      </div>
+          
+          {/* Title Field */}
+          <FormControl sx={{ m: 1, width: '100%' }} variant="outlined">
+            <InputLabel htmlFor="title">Title</InputLabel>
+            <OutlinedInput
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              label="Title"
+              required
+              fullWidth
+            />
+          </FormControl>
+          
+          {/* Description Field */}
+          <FormControl sx={{ m: 1, width: '100%' }} variant="outlined">
+            <InputLabel htmlFor="description">Description</InputLabel>
+            <OutlinedInput
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              label="Description"
+              multiline
+              rows={4}
+              fullWidth
+            />
+          </FormControl>
+          
+          {/* Add To-Do Button */}
+          <Button 
+            onClick={handleAddToDo}
+            variant="contained" 
+            sx={{ marginTop: 2, padding: '10px 20px', bgcolor: '#fdcc01', color: 'black' }}
+          >
+            Add To-Do
+          </Button>
+        </Paper>
+      </Container>
     </div>
   );
 };

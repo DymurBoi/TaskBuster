@@ -1,20 +1,46 @@
-// src/components/ToDoListLanding.jsx
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Grid from '@mui/material/Grid2';
 import './css.css';
+import ChecklistIcon from '@mui/icons-material/Checklist';
 
 const API_BASE_URL = "http://localhost:8080/api/user";
 
 const ToDoListLanding = () => {
   const [todos, setTodos] = useState([]);
   const [selectedTodo, setSelectedTodo] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [editFormData, setEditFormData] = useState({ title: '', description: '' });
   const navigate = useNavigate();
 
   const token = localStorage.getItem('authToken');
-  const userId = localStorage.getItem('loggedInUserId'); // Assuming userId is stored in local storage
+  const userId = localStorage.getItem('loggedInUserId');
+
+  const authHeaders = () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      throw new Error("User is not authenticated. Token is missing.");
+    }
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    };
+  }
 
   useEffect(() => {
     const fetchToDos = async () => {
@@ -22,46 +48,31 @@ const ToDoListLanding = () => {
         console.error("Token is missing");
         return;
       }
-  
-      const userId = localStorage.getItem('loggedInUserId'); // Ensure userId is stored in localStorage after login
-      console.log("Retrieved userId:", userId);
-  
+
       try {
         const response = await axios.get(`${API_BASE_URL}/todos?userId=${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}` },
         });
         setTodos(response.data || []);
       } catch (error) {
         console.error("Failed to fetch to-do list:", error);
       }
     };
-  
+
     fetchToDos();
-  }, [token]);
+  }, [token, userId]);
 
-  const handleViewDetails = (todo) => {
-    setSelectedTodo(todo);
-    setIsEditing(false);
-  };
-
-  const handleEdit = (todo) => {
-    setSelectedTodo(todo);
-    setIsEditing(true);
-    setEditFormData({ title: todo.title, description: todo.description });
-  };
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/deleteT/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+      await axios.delete(`${API_BASE_URL}/deleteT/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      setTodos(todos.filter(todo => todo.toDoListID !== id));
+      setTodos(todos.filter((todo) => todo.toDoListID !== id));
+      setConfirmDelete(false);
     } catch (error) {
       console.error("Failed to delete to-do:", error);
+      setConfirmDelete(false);
     }
   };
 
@@ -69,85 +80,155 @@ const ToDoListLanding = () => {
     e.preventDefault();
     try {
       const updatedData = { ...selectedTodo, ...editFormData };
-      const response = await axios.put(`${API_BASE_URL}/updateT`, updatedData, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        params: { id: selectedTodo.toDoListID }
-      });
+      await axios.put(
+        `${API_BASE_URL}/updateT`, 
+        updatedData, 
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: { id: selectedTodo.toDoListID },
+        }
+      );
+  
+      // Update the local todos list
       setTodos(todos.map(todo =>
         todo.toDoListID === selectedTodo.toDoListID ? { ...todo, ...editFormData } : todo
       ));
-      setIsEditing(false);
-      setSelectedTodo(null);
+  
+      // Close the edit dialog
+      setEditing(false);
+      setSelectedTodo(null); // Clear selectedTodo
     } catch (error) {
       console.error("Failed to update to-do:", error);
     }
   };
 
+  const handleEditDialogOpen = (todo) => {
+    setSelectedTodo(todo);
+    setEditFormData({ title: todo.title, description: todo.description });
+    setEditing(true);
+  };
+
+  const handleDeleteDialogOpen = (todo) => {
+    setSelectedTodo(todo);
+    setConfirmDelete(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('loggedInUserId');
+    navigate('/login');
+  };
+
   return (
     <div>
-      <nav className="navbar">
-        <h1 className="navbar-logo">TaskBuster</h1>
-        <div className="navbar-links">
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/profile" className="nav-link">Profile</Link>
-        </div>
-      </nav>
-    <div className="screen">
-      <div className="todo-container">
-        <h2 className="header">Your To-Do List</h2>
-        <button onClick={() => navigate('/todos/new')} className="button">Add To-Do</button>
-        {todos.length > 0 ? (
-          todos.map(todo => (
-            <div key={todo.toDoListID} className="todo-item" >
-              <h3 onClick={() => navigate(`/taskview/${todo.toDoListID}`)}className="todo-title" >{todo.title}</h3>
-              <h2  className="todo-title">{todo.description}</h2>
-              <button onClick={() => handleEdit(todo)} className="button">Edit</button>
-              <button onClick={() => handleDelete(todo.toDoListID)} className="button">Delete</button>
-            </div>
-          ))
-        ) : (
-          <p className="text-color-black">No to-do items found.</p>
-        )}
-
-        {selectedTodo && !isEditing && (
-          <div className="details-view">
-            <h3 className="text-color-black">To-Do Details</h3>
-            <p className="text-color-black"><strong>Title:</strong> {selectedTodo.title}</p>
-            <p className="text-color-black"><strong>Description:</strong> {selectedTodo.description}</p>
-            <p className="text-color-black"><strong>Status:</strong> {selectedTodo.status}</p>
+       <nav className="navbar">
+          <Button
+          startIcon={<ChecklistIcon />}
+          sx={{width:'10%',ml:4,color:'white','& .MuiSvgIcon-root': { fontSize: 40 }}}
+          ><h1 className="navbar-logo">TaskBuster</h1>
+          </Button>
+          <div className="navbar-links">
+            <Link to="/todos" className="nav-link">Todos</Link>
+            <Link to="/profile" className="nav-link">Profile</Link>
+            <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
           </div>
-        )}
+        </nav>
 
-        {isEditing && (
-          <form onSubmit={handleUpdate} className="edit-form">
-            <h3 className="text-color-black">Edit To-Do</h3>
-            <label className="label">
-              Title:
-              <input
-                type="text"
-                value={editFormData.title}
-                onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
-                required
-                className="input"
-              />
-            </label>
-            <label className="label">
-              Description:
-              <textarea
-                value={editFormData.description}
-                onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-                required
-                className="textarea"
-              />
-            </label>
-            <button type="submit" className="button">Save Changes</button>
-            <button type="button" onClick={() => setIsEditing(false)} className="button">Cancel</button>
-          </form>
-        )}
-      </div>
-    </div>
+      <Typography variant="h2" sx={{ marginBottom: '2em', textAlign: 'center' }}>
+        Your To-Do List
+      </Typography>
+
+      <Grid container spacing={3} justifyContent="center">
+        {todos.map((todo) => (
+          <Grid xs={12} sm={6} md={4} key={todo.toDoListID}>
+            <Card sx={{ minWidth: 275,
+                    minHeight: 278,
+                    maxHeight: 278,
+                    maxWidth: 345,
+                    padding:2,
+                    pb:0,
+                    margin: '0 auto',
+                    cursor: 'pointer',
+                    '&:hover': { boxShadow: 6 },
+                    justifyContent: 'center',}}>
+              <CardContent>
+                <Typography sx={{mb:7}} onClick={() => navigate(`/taskview/${todo.toDoListID}`)}variant="h5">{todo.title}</Typography>
+                <Typography variant="body2">{todo.description}</Typography>
+              </CardContent>
+              <CardActions sx={{mt:3,padding:2}}>
+                <Button variant="contained" size="small" onClick={() => handleEditDialogOpen(todo)}>Update</Button>
+                <Button variant="contained" size="small" color="error" onClick={() => handleDeleteDialogOpen(todo)}>Delete</Button>
+              </CardActions>
+            </Card>
+          </Grid>
+        ))}
+        <Grid xs={12} sm={6} md={4}>
+          <Card
+           sx={{ minWidth: 275,
+            minHeight: 278,
+            maxHeight: 278,
+            maxWidth: 345,
+            padding:2,
+            pb:0,
+            margin: '0 auto',
+            cursor: 'pointer',
+            '&:hover': { boxShadow: 6 },
+            justifyContent: 'center',}}
+            onClick={() => navigate('/todos/new')}
+          >
+            <CardContent>
+              <Typography variant="h5">Add New To-Do</Typography>
+              <Typography variant="h1" align="center">+</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Update Dialog */}
+      <Dialog open={editing} onClose={() => setEditing(false)}>
+        <DialogTitle>Update To-Do</DialogTitle>
+        <DialogContent>
+          <label>
+            Title:
+            <input
+              type="text"
+              value={editFormData.title}
+              onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
+              className="input"
+            />
+          </label>
+          <label>
+            Description:
+            <textarea
+              value={editFormData.description}
+              onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+              className="input"
+            />
+          </label>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleUpdate} color="primary">Save</Button>
+          <Button onClick={() => setEditing(false)} color="red">Cancel</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={confirmDelete} onClose={() => setConfirmDelete(false)}>
+        <DialogTitle>Are you sure you want to delete this to-do?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>This action cannot be undone.</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleDelete(selectedTodo.toDoListID)} color="primary">
+            Yes
+          </Button>
+          <Button onClick={() => setConfirmDelete(false)} color="secondary">
+            No
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

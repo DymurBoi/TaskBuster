@@ -1,7 +1,9 @@
-// src/components/UserProfile.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import { Box, Button, TextField, Paper, Typography, Container } from '@mui/material';
+import ChecklistIcon from '@mui/icons-material/Checklist';
+
 import './css.css';
 
 const UserProfile = () => {
@@ -79,67 +81,92 @@ const UserProfile = () => {
   };
 
   if (!user) return <p>Loading...</p>;
-
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('loggedInUserId');
+    navigate('/login');
+  }
   return (
-    <div className="screen">
-      <nav className="navbar">
-        <h1 className="navbar-logo">TaskBuster</h1>
-        <div className="navbar-links">
-        <Link to="/" className="nav-link">Home</Link>
-        <Link to="/profile" className="nav-link">Profile</Link>
-        </div>
-      </nav>
-
-      <div className="screen">
-        <div className="profile-container">
-          <h2 className="header">{user.name}'s Profile</h2>
-          {editing ? (
-            <div>
-              <label className="label">
-                Name:
-                <input
-                  type="text"
-                  value={user.name}
-                  onChange={(e) => setUser({ ...user, name: e.target.value })}
-                  className="input"
-                />
-              </label>
-              <label className="label">
-                Email:
-                <input
-                  type="email"
-                  value={user.email}
-                  onChange={(e) => setUser({ ...user, email: e.target.value })}
-                  className="input"
-                />
-              </label>
-              <label className="label">
-                Password:
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="input"
-                />
-              </label>
-              <button onClick={handleUpdateUser} className="button">Save</button>
-              <button onClick={() => setEditing(false)} className="button">Cancel</button>
-            </div>
-          ) : (
-            <div>
-              <p className="p">Name: {user.name}</p>
-              <p className="p">Email: {user.email}</p>
-              <p className="p">Date Joined: {new Date(user.dateJoined).toLocaleDateString()}</p>
-              <button onClick={() => setEditing(true)} className="button">Edit</button>
-              <button onClick={handleDeleteUser} className="button">Delete Account</button>
-            </div>
-          )}
-          <div style={{ marginTop: '20px' }}>
-            <button onClick={handleViewToDoList} className="button">View To-Do List</button>
-            <button onClick={handleAddToDoList} className="button">Add To-Do</button>
+    <div>
+        <nav className="navbar">
+          <Button
+          startIcon={<ChecklistIcon />}
+          sx={{width:'10%',ml:4,color:'white','& .MuiSvgIcon-root': { fontSize: 41 }}}
+          ><h1 className="navbar-logo">TaskBuster</h1>
+          </Button>
+          <div className="navbar-links">
+            <Link to="/todos" className="nav-link">Todos</Link>
+            <Link to="/profile" className="nav-link">Profile</Link>
+            <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
           </div>
-        </div>
-      </div>
+        </nav>
+    <Container maxWidth="sm">
+        <Box sx={{ mt: 4 }}>
+          <Paper elevation={3} sx={{ padding: 3 }}>
+            <Typography variant="h4" component="h2" align="center" gutterBottom>
+              {user.name}'s Profile
+            </Typography>
+
+            {editing ? (
+              <div>
+                <Box sx={{ mb: 2 }}>
+                  <TextField
+                    label="Name"
+                    fullWidth
+                    value={user.name}
+                    onChange={(e) => setUser({ ...user, name: e.target.value })}
+                    sx={{ mb: 2 }}
+                  />
+                  <TextField
+                    label="Email"
+                    type="email"
+                    fullWidth
+                    value={user.email}
+                    onChange={(e) => setUser({ ...user, email: e.target.value })}
+                    sx={{ mb: 2 }}
+                  />
+                  <TextField
+                    label="Password"
+                    type="password"
+                    fullWidth
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    sx={{ mb: 2 }}
+                  />
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between',gap:2.5,pb:2 }}>
+                  <Button onClick={handleUpdateUser} variant="contained" color="primary">
+                    Save
+                  </Button>
+                  <Button onClick={() => setEditing(false)} variant="outlined" color="secondary">
+                    Cancel
+                  </Button>
+                </Box>
+              </div>
+            ) : (
+              <div>
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                  <strong>Name:</strong> {user.name}
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                  <strong>Email:</strong> {user.email}
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 2 }}>
+                  <strong>Date Joined:</strong> {new Date(user.dateJoined).toLocaleDateString()}
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, gap:2,pb:1 }}>
+                  <Button onClick={() => setEditing(true)} variant="contained" sx={{bgcolor:'#fdcc01'}}>
+                    Edit
+                  </Button>
+                  <Button onClick={handleDeleteUser} variant="contained" color="error">
+                    Delete Account
+                  </Button>
+                </Box>
+              </div>
+            )}
+          </Paper>
+        </Box>
+    </Container>
     </div>
   );
 };

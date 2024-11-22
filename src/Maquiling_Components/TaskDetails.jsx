@@ -1,4 +1,4 @@
-import { useParams,useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ThemeProvider } from '@emotion/react';
@@ -14,7 +14,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Tooltip from '@mui/material/Tooltip';
-import { Link,useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ReplayIcon from '@mui/icons-material/Replay';
@@ -25,26 +25,26 @@ const theme = createTheme({
     fontFamily: `'Poppins', sans-serif`,
     h3: {
       color: 'black',
-      textAlign: 'center',  // Center the heading text
+      textAlign: 'center',
     },
     h4: {
       color: 'black',
-      textAlign: 'left',  // Center the heading text
+      textAlign: 'left',
     },
     h5: {
       color: 'black',
-      textAlign: 'left',  // Center the heading text
+      textAlign: 'left',
     }
   },
 });
 
 function TaskUpdate() {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const location = useLocation();
   const { taskId } = location.state || {};  // Get taskId from URL
+
   const [confirm, setConfirm] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [filteredComments, setFilteredComments] = useState([]);
   const [currentData, setCurrentData] = useState({
     taskId: '',
     title: '',
@@ -67,67 +67,88 @@ function TaskUpdate() {
     tag: { tagId: '', name: '' },
     toDoList: { toDoListID: '' },
   });
+
   const [newComment, setNewComment] = useState({
-    commentText: '', // This holds the content of the comment
-    task: { taskId: taskId }, // Automatically set taskId from state
+    commentText: '', 
+    task: { taskId: taskId }, 
     createdAt: new Date().toISOString(),
   });
+  const [filteredComments, setFilteredComments] = useState([]);
   const [submittedComment, setSubmittedComment] = useState(null);
-  
-  useEffect(() => {
-    if (taskId) {
-      // Fetch task details from API
-      axios.get(`/api/taskbuster/getTask/${taskId}`)
-        .then(response => {
-          const task = response.data;
-          setCurrentData(task);
-          setUpdateData(task);
-        })
-        .catch(error => console.error("Error fetching task:", error));
-      
-        axios.get(`/api/taskbuster/getComment`)
-        .then(response => {
-          // Filter comments to only include those related to the specified taskId
-          const taskComments = response.data.filter(comment => comment.task.taskId === taskId);
-          setFilteredComments(taskComments);
-        })
-        .catch(error => console.error("Error fetching comments:", error));
+
+  const token = localStorage.getItem('authToken');
+  const userId = localStorage.getItem('loggedInUserId');
+
+  const authHeaders = () => {
+    if (!token) {
+      navigate('/login');  // Redirect to login if token is missing
+      return null;
     }
-  }, [taskId]);
-const postComment = (comment) => {
-    axios.post('/api/taskbuster/postComment', comment) // Replace with your API endpoint
-      .then(response => {
-        // Update the submittedComment with the response data of the posted comment
-        setSubmittedComment(response.data);
-        // Reset the form after submission
-        setNewComment({
-          commentText: '',
-          task: { taskId: taskId },
-          createdAt: new Date().toISOString(),
-        });
-      })
-      .catch(error => console.error("Error posting comment:", error));
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    };
   };
 
-  const updateTaskComplete = () => {
-    const taskToUpdate = { ...updateData, status: 'Completed' };
-    axios.put(`/api/taskbuster/putTask`, taskToUpdate, {
-      params: { taskId: taskToUpdate.taskId },
-    })
-      .then(response => {
-        console.log("Task updated successfully:", response.data);
-      })
-      .catch(error => console.error("Error updating task:", error));
+  useEffect(() => {
+    const fetchData = async () => {
+      if (taskId && token) {
+        try {
+          const taskResponse = await axios.get(`/api/taskbuster/getTask/${taskId}`, authHeaders());
+          setCurrentData(taskResponse.data);
+          setUpdateData(taskResponse.data);
+
+          const commentResponse = await axios.get(`/api/taskbuster/getComment`, authHeaders());
+          const taskComments = commentResponse.data.filter(comment => comment.task.taskId === taskId);
+          setFilteredComments(taskComments);
+        } catch (error) {
+          console.error('Error fetching task or comments:', error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [taskId, token]);
+
+  const postComment = async (comment) => {
+    try {
+      const response = await axios.post('/api/taskbuster/postComment', comment, authHeaders());
+      // Add the new comment to the existing filtered comments
+      setFilteredComments(prevComments => [response.data, ...prevComments]);
+      setSubmittedComment(response.data);
+      setNewComment({
+        commentText: '',
+        task: { taskId: taskId },
+        createdAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('Error posting comment:', error);
+    }
   };
-  const updateTaskPending = () => {
-    const taskToUpdate = { ...updateData, status: 'Pending' };
-    axios.put(`/api/taskbuster/putTask`, taskToUpdate, {
-      params: { taskId: taskToUpdate.taskId },
-    })
-      .then(response => {
-        console.log("Task updated successfully:", response.data);
-      })
-      .catch(error => console.error("Error updating task:", error));
+
+  const deleteComment = async (commentId) => {
+    try {
+      await axios.delete(`/api/taskbuster/deleteComment/${commentId}`, authHeaders());
+      // Remove the deleted comment from filteredComments
+      setFilteredComments(prevComments => prevComments.filter(comment => comment.commentId !== commentId));
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+    }
+  };
+
+  const updateTaskStatus = async (status) => {
+    const taskToUpdate = { ...updateData, status: status };
+    try {
+      await axios.put(`/api/taskbuster/putTask`, taskToUpdate, {
+        params: { taskId: taskToUpdate.taskId },
+        ...authHeaders()
+      });
+      setCurrentData(prevState => ({ ...prevState, status }));
+    } catch (error) {
+      console.error('Error updating task status:', error);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -142,234 +163,146 @@ const postComment = (comment) => {
       [name]: value,
     }));
   };
-  const confirmButton = (id) => {
-    setSelectedTask(id);
-    setConfirm(true);
-  };
-  const deleteTask = (taskId) => {
-    if (!taskId) return;
 
-    axios.delete(`http://localhost:8080/api/taskbuster/deleteTask/${taskId}`, {
-    })
+  const confirmDeleteTask = () => {
+    axios.delete(`http://localhost:8080/api/taskbuster/deleteTask/${selectedTask}`, authHeaders())
       .then(() => {
-        // Remove the task from the state after successful deletion
         navigate(`/taskview/${currentData.toDoList.toDoListID}`);
-        setConfirm(false); // Close the confirmation dialog
+        setConfirm(false);
       })
       .catch(error => {
-        console.error("Error deleting task:", error);
-        setConfirm(false); // Close the dialog in case of an error
+        console.error('Error deleting task:', error);
+        setConfirm(false);
       });
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('loggedInUserId');
+    navigate('/login');
+  };
+
   return (
     <div>
       <ThemeProvider theme={theme}>
-      <nav className="navbar">
+        <nav className="navbar">
           <Button
-          startIcon={<ChecklistIcon />}
-          sx={{width:'10%',ml:4,color:'white','& .MuiSvgIcon-root': { fontSize: 40 }}}
-          ><h1 className="navbar-logo">TaskBuster</h1>
+            startIcon={<ChecklistIcon />}
+            sx={{ width: '10%', ml: 4, color: 'white', '& .MuiSvgIcon-root': { fontSize: 41 } }}
+          >
+            <h1 className="navbar-logo">TaskBuster</h1>
           </Button>
           <div className="navbar-links">
-            <Link to="/" className="nav-link">Home</Link>
+            <Link to="/todos" className="nav-link">Todos</Link>
             <Link to="/profile" className="nav-link">Profile</Link>
+            <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
           </div>
         </nav>
 
-        <Container fixed sx={{padding:0}} >
-        <Typography variant="h3" component="div" sx={{mb:2}}>
-          Task Details
-        </Typography>
-        <Paper elevation={6} sx={{p:5, mb:5}}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', gap: 70}}>
-        <Box sx={{ display: 'flex', width:700, flexDirection: 'column', gap: 1.5}}>
-        <Typography variant='h4' component="div">
-          Task Name:
-        </Typography>
-        <Typography variant='h5' component="div">
-          {currentData.title}
-        </Typography>
-        <Typography variant='h4' component="div">
-          Description: 
-        </Typography>
-        <Typography variant='h5' component="div">
-          {currentData.description}
-        </Typography>
-        <Typography variant='h4' component="div">
-          Status: 
-        </Typography>
-        <Typography variant='h5' component="div" sx={{ color: currentData.status === 'Pending' ? 'orange' : currentData.status === 'Completed' ? '#1ad62d' : 'text.secondary',}}>
-          {currentData.status}
-        </Typography>
-        <Typography variant='h4' component="div">
-          Due Date: 
-        </Typography>
-        <Typography variant='h5' component="div">
-        {new Date(currentData.dueDate).toLocaleDateString()}
-        </Typography>
-        <Typography variant='h4' component="div">
-         Priority:
-        </Typography>
-        <Typography variant='h5' component="div">
-         {currentData.tag.name}
-        </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <Tooltip title="Update">
-          <Link to={`/taskupdate/${currentData.taskId}`} onClick={(event) => event.stopPropagation()}>
-            <Button
-              startIcon={<EditIcon />}
-              variant="contained"
-              size="large"
-              sx={{ width:200,backgroundColor: '#fdcc01' }}
-            >
-              Update Task
-            </Button>
-          </Link>
-        </Tooltip>
-        <Tooltip title="Delete">
-        <Button
-          variant="contained"
-          size="large"
-          startIcon={<DeleteIcon />}
-          sx={{width:200, backgroundColor: 'red', size:'small' }}
-          onClick={(event) => {
-            event.stopPropagation();
-            confirmButton(currentData.taskId);
-          }}
-        >
-          Delete Task
-        </Button>
+        <Container fixed sx={{ padding: 0 }}>
+          <Typography variant="h3" component="div" sx={{ mb: 2 }}>
+            Task Details
+          </Typography>
+          <Paper elevation={6} sx={{ p: 5, mb: 5 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 70 }}>
+              <Box sx={{ display: 'flex', width: 700, flexDirection: 'column', gap: 1.5 }}>
+                <Typography variant='h4' component="div">Task Name:</Typography>
+                <Typography variant='h5' component="div">{currentData.title}</Typography>
+                <Typography variant='h4' component="div">Description:</Typography>
+                <Typography variant='h5' component="div">{currentData.description}</Typography>
+                <Typography variant='h4' component="div">Status:</Typography>
+                <Typography variant='h5' component="div" sx={{ color: currentData.status === 'Pending' ? 'orange' : currentData.status === 'Completed' ? '#1ad62d' : 'text.secondary' }}>
+                  {currentData.status}
+                </Typography>
+                <Typography variant='h4' component="div">Due Date:</Typography>
+                <Typography variant='h5' component="div">{new Date(currentData.dueDate).toLocaleDateString()}</Typography>
+                <Typography variant='h4' component="div">Priority:</Typography>
+                <Typography variant='h5' component="div">{currentData.tag.name}</Typography>
+              </Box>
 
-        </Tooltip>
-        {currentData.status === "Pending" ? (
-        <Tooltip title="Complete">
-            <Button
-              startIcon={<CheckCircleOutlineIcon />}
-              variant="contained"
-              size="large"
-              onClick={updateTaskComplete}
-              sx={{ width: 200, backgroundColor: '#1ad62d', '&:hover': { backgroundColor: '#19c22a' } }}
-            >
-              Complete Task
-            </Button>
-        </Tooltip>
-        ) : (
-        <Tooltip title="Set to Pending">
-            <Button
-              startIcon={<ReplayIcon />}  // You can use a replay icon to signify the reset to Pending
-              variant="contained"
-              size="large"
-              onClick={updateTaskPending}
-              sx={{ width: 200, backgroundColor: '#fcbf49', '&:hover': { backgroundColor: '#f6a900' } }}
-            >
-              Set to Pending
-            </Button>
-        </Tooltip>
-      )}
-        
-        </Box>
-        </Box>
-        </Paper>
-        
-        <Box sx={{bgcolor:'#dedede', display: 'flex', flexDirection: 'column',mb:8,borderRadius:4}}>
-        
-        <form onSubmit={handleSubmit}>
-            <Box sx={{pl:3,pr:2,display: 'flex', flexDirection: 'row',gap: 2,m:3,mb:1}}>
-            <TextField
-              label="Comment Text"
-              name="commentText"
-              variant="outlined"
-              value={newComment.commentText}
-              onChange={handleChange}
-              fullWidth
-              multiline  // Enable multiline mode
-              rows={3}   // Number of rows to display
-              sx={{bgcolor:'white'}}  // Adjust minimum height
-            />
-              {/* Task ID is displayed but not editable */}
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                size="small"
-                sx={{mt:3,width:100}}
-              >
-                Add Comment
-              </Button>
-            </Box>
-          </form>
-        
-        <Typography variant='h3' sx={{mb:3}}>Comments</Typography>
-        {filteredComments.length > 0 ? (
-          filteredComments.map(comment => (
-            <Box key={comment.commentId}>
-              <Paper elevation={6} sx={{mb:5, ml:5,mr:5,padding:2}}>
-                <Box spacing={5}sx={{display: 'flex', flexDirection: 'row',pb:2,gap:5}}>
-                <Typography variant='h5'>Comment #{comment.commentId}</Typography>
-                <Typography variant='h5'>{new Date(comment.createdAt).toLocaleDateString()}</Typography>
-                </Box>
-                <Typography variant='h5' sx={{pl:2}}>{comment.commentText}</Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1,paddingRight:3,ml:0}}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                 <Tooltip title="Update">
-                  <Link to={`/taskupdate/${currentData.taskId}`} onClick={(event) => event.stopPropagation()}>
-                    <Button
-                      startIcon={<EditIcon />}
-                      variant="text"
-                      size="small"
-                      sx={{ width:150,pl:0}}
-                    >
-                      Update Task
-                    </Button>
+                  <Link to={`/taskupdate/${currentData.taskId}`} style={{ textDecoration: 'none' }}>
+                    <Button sx={{ width: '150px' }} variant="outlined" color="success" startIcon={<CheckCircleOutlineIcon />} fullWidth>Update Task</Button>
                   </Link>
                 </Tooltip>
-                <Tooltip title="Delete">
-                <Button
-                  variant="text"
-                  size="small"
-                  startIcon={<DeleteIcon />}
-                  sx={{width:150}}
-                  onClick={(event) => {
+
+                <Tooltip title="Delete Task">
+                  <Button sx={{ width: '150px' }} variant="outlined" color="error" startIcon={<DeleteIcon />} fullWidth onClick={(event) => {
                     event.stopPropagation();
-                    confirmButton(currentData.taskId);
-                  }}
-                >
-                  Delete Task
-                </Button>
+                    setConfirm(true);
+                  }}>
+                    Delete Task
+                  </Button>
                 </Tooltip>
-                </Box>
-              </Paper>
+
+                {/* Task Status Buttons */}
+                {currentData.status === 'Pending' ? (
+                  <Button
+                    sx={{ width: '150px' }}
+                    variant="outlined"
+                    color="success"
+                    startIcon={<CheckCircleOutlineIcon />}
+                    fullWidth
+                    onClick={() => updateTaskStatus('Completed')}
+                  >
+                    Mark as Completed
+                  </Button>
+                ) : (
+                  <Button
+                    sx={{ width: '150px' }}
+                    variant="outlined"
+                    color="warning"
+                    startIcon={<ReplayIcon />}
+                    fullWidth
+                    onClick={() => updateTaskStatus('Pending')}
+                  >
+                    Mark as Pending
+                  </Button>
+                )}
+              </Box>
             </Box>
-          ))
-        ) : (
-          <p>No comments for this task.</p>
-        )}
-      </Box>
-      {confirm && (
-              <Dialog
-                open={confirm}
-                onClose={() => setConfirm(false)}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-              >
-                <DialogTitle id="alert-dialog-title">
-                  {"Are you sure you want to delete this task?"}
-                </DialogTitle>
-                <DialogContent>
-                  <DialogContentText id="alert-dialog-description">
-                    This action cannot be undone.
-                  </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={() => { deleteTask(selectedTask); setConfirm(false); }} color="primary">
-                    Yes
-                  </Button>
-                  <Button onClick={() => setConfirm(false)} color="primary" autoFocus>
-                    No
-                  </Button>
-                </DialogActions>
-              </Dialog>
-            )}
+          </Paper>
+
+          {/* Comments Section */}
+          <Typography variant="h5">Comments</Typography>
+          <Box sx={{ width: '100%', marginBottom: '20px' }}>
+            {filteredComments.map((comment) => (
+              <Box key={comment.commentId} sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                <Typography variant="body1">{comment.commentText}</Typography>
+                <Button color="error" onClick={() => deleteComment(comment.commentId)}>
+                  <DeleteIcon />
+                </Button>
+              </Box>
+            ))}
+          </Box>
+
+          <form onSubmit={handleSubmit}>
+            <TextField
+              fullWidth
+              label="Add a Comment"
+              name="commentText"
+              value={newComment.commentText}
+              onChange={handleChange}
+              variant="outlined"
+              sx={{ marginBottom: '20px' }}
+            />
+            <Button variant="contained" color="primary" type="submit" sx={{ width: '100%' }}>
+              Add Comment
+            </Button>
+          </form>
+
+          {/* Delete Confirmation Dialog */}
+          <Dialog open={confirm} onClose={() => setConfirm(false)}>
+            <DialogTitle>Are you sure you want to delete this task?</DialogTitle>
+            <DialogContent>
+              <DialogContentText>This action cannot be undone.</DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={confirmDeleteTask} color="primary">Yes</Button>
+              <Button onClick={() => setConfirm(false)} color="secondary">No</Button>
+            </DialogActions>
+          </Dialog>
         </Container>
       </ThemeProvider>
     </div>

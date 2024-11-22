@@ -4,9 +4,8 @@ import axios from 'axios';
 import { ThemeProvider } from '@emotion/react';
 import { createTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import { TextField, Button, Container, Box } from '@mui/material';
+import { TextField, Button, Container, Box, Paper } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { Link } from 'react-router-dom';
 import './task.css';
 
@@ -16,7 +15,18 @@ const theme = createTheme({
     h2: {
       color: 'black',
       textAlign: 'center',  // Center the heading text
-    }
+    },
+    button: {
+      color: 'yellow',
+    },
+  },
+  palette: {
+    primary: {
+      main: '#1976d2',
+    },
+    secondary: {
+      main: '#f50057',
+    },
   },
 });
 
@@ -60,17 +70,13 @@ function TaskUpdate() {
   }, [taskId]);
 
   const updateTag = (tagId, priority) => {
-    // Prepare the data to update the tag
     const updatedTag = {
       name: priority,
       updatedAt: new Date().toISOString(),
     };
 
-    // Make PUT request to update the tag using the provided tagId
     axios.put(`/api/taskbuster/putTag?tagId=${tagId}`, updatedTag)
       .then(response => {
-        console.log("Tag updated successfully:", response.data);
-        // Update the local state with the new tag information
         setUpdateData(prevData => ({
           ...prevData,
           tag: { tagId: response.data.tagId, name: response.data.name },
@@ -96,7 +102,7 @@ function TaskUpdate() {
 
   const handleUpdateChange = (e) => {
     const { name, value } = e.target;
-    setUpdateData((prevData) => ({
+    setUpdateData(prevData => ({
       ...prevData,
       [name]: value,
     }));
@@ -109,7 +115,7 @@ function TaskUpdate() {
   return (
     <div>
       <ThemeProvider theme={theme}>
-      <nav className="navbar">
+        <nav className="navbar">
           <h1 className="navbar-logo">TaskBuster</h1>
           <div className="navbar-links">
             <Link to="/" className="nav-link">Home</Link>
@@ -117,57 +123,84 @@ function TaskUpdate() {
           </div>
         </nav>
         <div className='screen'>
-        <Typography variant="h2" component="div">
-          Update Task
-        </Typography>
+          <Container maxWidth="sm" sx={{ mt: 4 }}>
+            <Typography variant="h2" gutterBottom>
+              Update Task
+            </Typography>
 
-        {/* Form to update task */}
-        <form onSubmit={handleUpdateSubmit}>
-        <div>
-            <button type="button" onClick={() => handleTagUpdate(currentData.tag.tagId, "Low Priority")}>Low Priority</button>
-            <button type="button" onClick={() => handleTagUpdate(currentData.tag.tagId, "High Priority")}>High Priority</button>
-            <button type="button" onClick={() => handleTagUpdate(currentData.tag.tagId, "Urgent")}>Urgent</button>
-        </div>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <TextField
-                label="Title"
-                name="title"
-                variant="outlined"
-                value={updateData.title}
-                onChange={handleUpdateChange}
-                fullWidth
-                required
-              />
-              <TextField
-                label="Description"
-                name="description"
-                variant="outlined"
-                value={updateData.description}
-                onChange={handleUpdateChange}
-                fullWidth
-                required
-              />
-              <TextField
-                label="Due Date"
-                name="dueDate"
-                type="datetime-local"
-                variant="outlined"
-                value={updateData.dueDate}
-                onChange={handleUpdateChange}
-                fullWidth
-                required
-              />
+            {/* Priority Selection Buttons (Aligned in a row) */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 2, gap: 2 }}>
               <Button
-                type="submit"
+                onClick={() => handleTagUpdate(currentData.tag.tagId, "Low Priority")}
                 variant="contained"
-                color="primary"
-                size="large"
-                sx={{ mt: 2 }}
+                sx={{ bgcolor: "#fdcc01" }}
               >
-                Update Task
+                Low Priority
+              </Button>
+              <Button
+                onClick={() => handleTagUpdate(currentData.tag.tagId, "High Priority")}
+                variant="contained"
+                sx={{ bgcolor: "#fdcc01" }}
+              >
+                High Priority
+              </Button>
+              <Button
+                onClick={() => handleTagUpdate(currentData.tag.tagId, "Urgent")}
+                variant="contained"
+                sx={{ bgcolor: "#fdcc01" }}
+              >
+                Urgent
               </Button>
             </Box>
-        </form>
+
+            {/* Paper component for form container */}
+            <Paper elevation={3} sx={{ padding: 3 }}>
+              <form onSubmit={handleUpdateSubmit}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <TextField
+                    label="Title"
+                    name="title"
+                    variant="outlined"
+                    value={updateData.title}
+                    onChange={handleUpdateChange}
+                    fullWidth
+                    required
+                  />
+                  <TextField
+                    label="Description"
+                    name="description"
+                    variant="outlined"
+                    value={updateData.description}
+                    onChange={handleUpdateChange}
+                    fullWidth
+                    required
+                  />
+                  <TextField
+                    label="Due Date"
+                    name="dueDate"
+                    type="datetime-local"
+                    variant="outlined"
+                    value={updateData.dueDate}
+                    onChange={handleUpdateChange}
+                    fullWidth
+                    required
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    sx={{ mt: 2, bgcolor: "#fdcc01" }}
+                  >
+                    Update Task
+                  </Button>
+                </Box>
+              </form>
+            </Paper>
+          </Container>
         </div>
       </ThemeProvider>
     </div>
