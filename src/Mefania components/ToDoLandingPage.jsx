@@ -12,6 +12,16 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid2';
+import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
+import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import InboxIcon from '@mui/icons-material/MoveToInbox';
+import MailIcon from '@mui/icons-material/Mail';
 import './css.css';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 
@@ -27,7 +37,52 @@ const ToDoListLanding = () => {
 
   const token = localStorage.getItem('authToken');
   const userId = localStorage.getItem('loggedInUserId');
+  const [open, setOpen] = React.useState(false);
 
+  const toggleDrawer = (newOpen) => () => {
+    setOpen(newOpen);
+  };
+
+  const DrawerList = (
+    
+    <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
+       {todos.map((todo) => (
+          <Grid xs={12} sm={6} md={4} key={todo.toDoListID}>
+              <CardContent>
+                <Typography sx={{mb:7}} onClick={() => navigate(`/taskview/${todo.toDoListID}`)}variant="h5">{todo.title}</Typography>
+                <Typography variant="body2">{todo.description}</Typography>
+              </CardContent>
+                <Button variant="contained" size="small" onClick={() => handleEditDialogOpen(todo)}>Update</Button>
+                <Button variant="contained" size="small" color="error" onClick={() => handleDeleteDialogOpen(todo)}>Delete</Button> 
+          </Grid>
+        ))}
+      <List>
+        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+          <ListItem key={text} disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+              </ListItemIcon>
+              <ListItemText primary={text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+      <Divider />
+      <List>
+        {['All mail', 'Trash', 'Spam'].map((text, index) => (
+          <ListItem key={text} disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+              </ListItemIcon>
+              <ListItemText primary={text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
   const authHeaders = () => {
     const token = localStorage.getItem('authToken');
     if (!token) {
@@ -123,11 +178,16 @@ const ToDoListLanding = () => {
   return (
     <div>
        <nav className="navbar">
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+       <Button onClick={toggleDrawer(true)} sx={{ width: 'auto', mr: 1 }}><ChecklistIcon sx={{color:'white','& .MuiSvgIcon-root': { fontSize: 100 }}} /></Button>
+      <Drawer open={open} onClose={toggleDrawer(false)}>
+        {DrawerList}
+      </Drawer>
           <Button
-          startIcon={<ChecklistIcon />}
-          sx={{width:'10%',ml:4,color:'white','& .MuiSvgIcon-root': { fontSize: 40 }}}
+          sx={{width:'10%',ml:0,color:'white','& .MuiSvgIcon-root': { fontSize: 40 }}}
           ><h1 className="navbar-logo">TaskBuster</h1>
           </Button>
+          </Box>
           <div className="navbar-links">
             <Link to="/todos" className="nav-link">Todos</Link>
             <Link to="/profile" className="nav-link">Profile</Link>
