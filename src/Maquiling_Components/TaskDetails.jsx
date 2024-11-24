@@ -26,6 +26,7 @@ const theme = createTheme({
     h3: {
       color: 'black',
       textAlign: 'center',
+      fontWeight:'bold'
     },
     h4: {
       color: 'black',
@@ -192,8 +193,22 @@ function TaskUpdate() {
   return (
     <div>
       <ThemeProvider theme={theme}>
+        <nav className="navbar">
+          <Button
+            startIcon={<ChecklistIcon />}
+            sx={{ width: '10%', ml: 4, color: 'white', '& .MuiSvgIcon-root': { fontSize: 41 } }}
+          >
+            <h1 className="navbar-logo">TaskBuster</h1>
+          </Button>
+          <div className="navbar-links">
+            <Link to="/todos" className="nav-link">Todos</Link>
+            <Link to="/profile" className="nav-link">Profile</Link>
+            <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
+          </div>
+        </nav>
+
         <Container fixed sx={{ padding: 0 }}>
-          <Typography variant="h3" component="div" sx={{ mb: 2 }}>
+          <Typography variant="h3" component="div" sx={{ mb: 2 ,mt:5}}>
             Task Details
           </Typography>
           <Paper elevation={6} sx={{ p: 5, mb: 5 }}>
@@ -232,17 +247,59 @@ function TaskUpdate() {
 
                 {/* Task Status Buttons */}
                 {currentData.status === 'Pending' ? (
-                  <Button sx={{ width: '150px' }} variant="outlined" color="success" startIcon={<CheckCircleOutlineIcon />} fullWidth onClick={() => updateTaskStatus('Completed')}>
+                  <Button
+                    sx={{ width: '150px' }}
+                    variant="outlined"
+                    color="success"
+                    startIcon={<CheckCircleOutlineIcon />}
+                    fullWidth
+                    onClick={() => updateTaskStatus('Completed')}
+                  >
                     Mark as Completed
                   </Button>
                 ) : (
-                  <Button sx={{ width: '150px' }} variant="outlined" color="warning" startIcon={<ReplayIcon />} fullWidth onClick={() => updateTaskStatus('Pending')}>
+                  <Button
+                    sx={{ width: '150px' }}
+                    variant="outlined"
+                    color="warning"
+                    startIcon={<ReplayIcon />}
+                    fullWidth
+                    onClick={() => updateTaskStatus('Pending')}
+                  >
                     Mark as Pending
                   </Button>
                 )}
               </Box>
             </Box>
           </Paper>
+
+          {/* Comments Section */}
+          <Typography variant="h5">Comments</Typography>
+          <Box sx={{ width: '100%', marginBottom: '20px' }}>
+            {filteredComments.map((comment) => (
+              <Box key={comment.commentId} sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px',mt:4,ml:5}}>
+                <Typography variant="body1">{comment.commentText}</Typography>
+                <Button color="error" onClick={() => deleteComment(comment.commentId)} sx={{width:20}}>
+                  <DeleteIcon />
+                </Button>
+              </Box>
+            ))}
+          </Box>
+
+          <form onSubmit={handleSubmit}>
+            <TextField
+              fullWidth
+              label="Add a Comment"
+              name="commentText"
+              value={newComment.commentText}
+              onChange={handleChange}
+              variant="outlined"
+              sx={{ marginBottom: '20px' }}
+            />
+            <Button variant="contained" color="primary" type="submit" sx={{ width: '100%' }}>
+              Add Comment
+            </Button>
+          </form>
 
           {/* Delete Confirmation Dialog */}
           <Dialog open={confirm} onClose={() => setConfirm(false)}>

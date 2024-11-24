@@ -74,19 +74,21 @@ const AdminLoginPage = ({ setIsLoggedIn, setAdmin }) => {
           
           <form onSubmit={handleLogin}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <FormControl sx={{ m: 1, width: '35ch' }} variant="outlined">
+            <InputLabel htmlFor="email"sx={{bgcolor:'white'}}>Email</InputLabel>
               <OutlinedInput
                 type="email"
-                placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 sx={{ width: '100%' }}
                 required
               />
-              
+              </FormControl>
               <Box sx={{ position: 'relative' }}>
+              <FormControl sx={{ m: 1, width: '35ch' }} variant="outlined">
+              <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                 <OutlinedInput
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   sx={{ width: '100%' }}
@@ -109,6 +111,8 @@ const AdminLoginPage = ({ setIsLoggedIn, setAdmin }) => {
             }
             label="Password"
                 />
+              </FormControl>
+
               </Box>
 
               <Button type="submit" variant="contained" color="primary" sx={{ width: '100%',bgcolor:'#fdcc01',color:'black' }}>

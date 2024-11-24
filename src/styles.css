@@ -12,6 +12,7 @@ body {
 /* Apply Poppins font to header, container boxes, and all elements inside them */
 header, header *, .login-form, .login-form *, .profile-content, .profile-content *, .dashboard-content, .dashboard-content * {
   font-family: 'Poppins', sans-serif !important;
+  color:black;
 }
 
 /* Center the container on the page */
