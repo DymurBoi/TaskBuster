@@ -58,12 +58,12 @@ const ToDoListLanding = () => {
                 <Typography sx={{mb:7}} onClick={() => navigate(`/taskview/${todo.toDoListID}`)}variant="h6">{todo.title}</Typography>
               </CardContent>
                 <Tooltip title="Update">
-                    <Button sx={{ width: '50px' }} variant="outlined" color="success" onClick={() => handleEditDialogOpen(todo)} >
+                    <Button sx={{ width: '50px' }}color="success" onClick={() => handleEditDialogOpen(todo)} >
                     <EditIcon/>
                       </Button>
                 </Tooltip>
                 <Tooltip title="Delete Task">
-                  <Button sx={{ width: '50px' }} variant="outlined" color="error"  onClick={(event) => {
+                  <Button sx={{ width: '50px' }} color="error"  onClick={(event) => {
                    handleDeleteDialogOpen(todo)
                   }}>
                     <DeleteIcon />
