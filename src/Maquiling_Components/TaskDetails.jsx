@@ -231,7 +231,9 @@ function TaskUpdate() {
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                 <Tooltip title="Update">
                   <Link to={`/taskupdate/${currentData.taskId}`} style={{ textDecoration: 'none' }}>
-                    <Button sx={{ width: '150px' }} variant="outlined" color="success" startIcon={<CheckCircleOutlineIcon />} fullWidth>Update Task</Button>
+                    <Button sx={{ width: '150px' }} variant="outlined" color="success" startIcon={<CheckCircleOutlineIcon />} fullWidth>
+                    Update Task
+                    </Button>
                   </Link>
                 </Tooltip>
 

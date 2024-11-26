@@ -23,8 +23,13 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+
 import './css.css';
 import ChecklistIcon from '@mui/icons-material/Checklist';
+import { Tooltip } from '@mui/material';
 
 const API_BASE_URL = "http://localhost:8080/api/user";
 
@@ -48,40 +53,25 @@ const ToDoListLanding = () => {
     
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
        {todos.map((todo) => (
-          <Grid xs={12} sm={6} md={4} key={todo.toDoListID}>
+          <Box xs={12} sm={6} md={4} key={todo.toDoListID}  sx={{ display: 'flex', flexDirection: 'row' }}>
               <CardContent>
-                <Typography sx={{mb:7}} onClick={() => navigate(`/taskview/${todo.toDoListID}`)}variant="h5">{todo.title}</Typography>
-                <Typography variant="body2">{todo.description}</Typography>
+                <Typography sx={{mb:7}} onClick={() => navigate(`/taskview/${todo.toDoListID}`)}variant="h6">{todo.title}</Typography>
               </CardContent>
-                <Button variant="contained" size="small" onClick={() => handleEditDialogOpen(todo)}>Update</Button>
-                <Button variant="contained" size="small" color="error" onClick={() => handleDeleteDialogOpen(todo)}>Delete</Button> 
-          </Grid>
+                <Tooltip title="Update">
+                    <Button sx={{ width: '50px' }} variant="outlined" color="success" onClick={() => handleEditDialogOpen(todo)} >
+                    <EditIcon/>
+                      </Button>
+                </Tooltip>
+                <Tooltip title="Delete Task">
+                  <Button sx={{ width: '50px' }} variant="outlined" color="error"  onClick={(event) => {
+                   handleDeleteDialogOpen(todo)
+                  }}>
+                    <DeleteIcon />
+                  </Button>
+                </Tooltip> 
+          </Box>
         ))}
-      <List>
-        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-      <Divider />
-      <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+
     </Box>
   );
   const authHeaders = () => {
@@ -195,57 +185,6 @@ const ToDoListLanding = () => {
             <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
           </div>
         </nav>
-
-      <Typography variant="h2" sx={{ marginBottom: '2em', textAlign: 'center' }}>
-        Your To-Do List
-      </Typography>
-
-      <Grid container spacing={3} justifyContent="center">
-        {todos.map((todo) => (
-          <Grid xs={12} sm={6} md={4} key={todo.toDoListID}>
-            <Card sx={{ minWidth: 275,
-                    minHeight: 278,
-                    maxHeight: 278,
-                    maxWidth: 345,
-                    padding:2,
-                    pb:0,
-                    margin: '0 auto',
-                    cursor: 'pointer',
-                    '&:hover': { boxShadow: 6 },
-                    justifyContent: 'center',}}>
-              <CardContent>
-                <Typography sx={{mb:7}} onClick={() => navigate(`/taskview/${todo.toDoListID}`)}variant="h5">{todo.title}</Typography>
-                <Typography variant="body2">{todo.description}</Typography>
-              </CardContent>
-              <CardActions sx={{mt:3,padding:2}}>
-                <Button variant="contained" size="small" onClick={() => handleEditDialogOpen(todo)}>Update</Button>
-                <Button variant="contained" size="small" color="error" onClick={() => handleDeleteDialogOpen(todo)}>Delete</Button>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
-        <Grid xs={12} sm={6} md={4}>
-          <Card
-           sx={{ minWidth: 275,
-            minHeight: 278,
-            maxHeight: 278,
-            maxWidth: 345,
-            padding:2,
-            pb:0,
-            margin: '0 auto',
-            cursor: 'pointer',
-            '&:hover': { boxShadow: 6 },
-            justifyContent: 'center',}}
-            onClick={() => navigate('/todos/new')}
-          >
-            <CardContent>
-              <Typography variant="h5">Add New To-Do</Typography>
-              <Typography variant="h1" align="center">+</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-
       {/* Update Dialog */}
       <Dialog open={editing} onClose={() => setEditing(false)}>
         <DialogTitle>Update To-Do</DialogTitle>
