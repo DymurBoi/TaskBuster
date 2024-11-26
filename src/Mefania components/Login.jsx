@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { TextField,Box } from '@mui/material';
+import { TextField,Box, Typography, Button } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Input from '@mui/material/Input';
 import FilledInput from '@mui/material/FilledInput';
@@ -97,6 +97,11 @@ const Login = ({ onLogin }) => {
       </nav>
 
       <div className="screen">
+        <Box sx={{ display: 'flex', flexDirection: 'row'}}>
+          <Box sx={{mr:25,mt:25}}>
+            <Typography variant='h2' sx={{fontWeight:'bold',color:'black'}}> TaskBuster</Typography>
+            <Typography variant='h5' sx={{color:'black'}}>Organize all your tasks easily</Typography>
+          </Box>
         <div className="login-container">
           <h2 className="header">Login</h2>
           <form onSubmit={handleLogin}>
@@ -141,11 +146,12 @@ const Login = ({ onLogin }) => {
         </FormControl>
             </Box>
             {passwordError && <p className="error">{passwordError}</p>}
-            <button type="submit" className="button">
+            <Button type="submit" variant='contained' sx={{width:200,height:50,margin:2}}>
               Login
-            </button>
+            </Button>
           </form>
         </div>
+        </Box>
       </div>
     </div>
   );

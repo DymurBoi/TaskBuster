@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { createUser } from '../api';
 import { useNavigate, Link } from 'react-router-dom';
-import { Box, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, Paper } from '@mui/material';
+import { Box, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, Paper, Typography } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import Button from '@mui/material/Button';
@@ -144,8 +144,9 @@ const Register = () => {
               </FormControl>
             </Box>
             {passwordError && <p className="error">{passwordError}</p>}
-            <button type="submit" className="button">Register</button>
+            <Button type="submit" sx={{width:300,bgcolor:'#B4BB85',color:'white','&:hover': { bgcolor:'#969c6e'}}}>Register</Button>
           </form>
+          <Typography sx={{mt:2}}>Already signed up? <Link>Go to login</Link></Typography>
         </Paper>
       </div>
     </div>
