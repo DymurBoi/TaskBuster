@@ -106,7 +106,7 @@ const AddToDo = () => {
           <Button 
             onClick={handleAddToDo}
             variant="contained" 
-            sx={{ marginTop: 2, padding: '10px 20px', bgcolor: '#fdcc01', color: 'black' }}
+            sx={{width:500,bgcolor:'#B4BB85',color:'white','&:hover': { bgcolor:'#969c6e'}}}
           >
             Add To-Do
           </Button>

@@ -15,6 +15,8 @@ import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import ChecklistIcon from '@mui/icons-material/Checklist';
+
 import './css.css';
 
 const Login = ({ onLogin }) => {
@@ -80,9 +82,13 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="screen">
-      <nav className="navbar">
-        <h1 className="navbar-logo">TaskBuster</h1>
+    <div>
+     <nav className="navbar">
+      <Button
+          startIcon={<ChecklistIcon />}
+          sx={{width:'10%',ml:4,color:'white','& .MuiSvgIcon-root': { fontSize: 40 }}}
+          ><h1 className="navbar-logo">TaskBuster</h1>
+          </Button>
         <div className="navbar-links">
           <Link to="/" className="nav-link">
             Home
@@ -105,7 +111,7 @@ const Login = ({ onLogin }) => {
         <div className="login-container">
           <h2 className="header">Login</h2>
           <form onSubmit={handleLogin}>
-            <Box sx={{pr:9}}>
+            <Box sx={{pr:6.5}}>
             <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
               <InputLabel htmlFor="email">Email</InputLabel>
               <OutlinedInput
@@ -146,7 +152,7 @@ const Login = ({ onLogin }) => {
         </FormControl>
             </Box>
             {passwordError && <p className="error">{passwordError}</p>}
-            <Button type="submit" variant='contained' sx={{width:200,height:50,margin:2}}>
+            <Button type="submit" variant='contained' sx={{width:300,height:50,margin:2,bgcolor:'#B4BB85',color:'white','&:hover': { bgcolor:'#969c6e'}}}>
               Login
             </Button>
           </form>

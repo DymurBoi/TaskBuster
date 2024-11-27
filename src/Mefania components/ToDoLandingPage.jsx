@@ -50,30 +50,42 @@ const ToDoListLanding = () => {
   };
 
   const DrawerList = (
-    
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
-       {todos.map((todo) => (
-          <Box xs={12} sm={6} md={4} key={todo.toDoListID}  sx={{ display: 'flex', flexDirection: 'row' }}>
-              <CardContent>
-                <Typography sx={{mb:7}} onClick={() => navigate(`/taskview/${todo.toDoListID}`)}variant="h6">{todo.title}</Typography>
-              </CardContent>
-                <Tooltip title="Update">
-                    <Button sx={{ width: '50px' }}color="success" onClick={() => handleEditDialogOpen(todo)} >
-                    <EditIcon/>
-                      </Button>
-                </Tooltip>
-                <Tooltip title="Delete Task">
-                  <Button sx={{ width: '50px' }} color="error"  onClick={(event) => {
-                   handleDeleteDialogOpen(todo)
-                  }}>
-                    <DeleteIcon />
-                  </Button>
-                </Tooltip> 
-          </Box>
-        ))}
-
+      {/* Add New To-Do Button */}
+      <Box sx={{ p: 2 }}>
+        <Button
+          variant="outlined"
+          sx={{width:200,bgcolor:'#B4BB85',color:'white','&:hover': { bgcolor:'#969c6e'}}}
+          fullWidth
+          onClick={() => navigate('/todos/new')}
+        >
+         + Add New To-Do
+        </Button>
+      </Box>
+      <Divider sx={{ mb: 2 }} />
+      {/* Existing To-Do Lists */}
+      {todos.map((todo) => (
+        <Box xs={12} sm={6} md={4} key={todo.toDoListID} sx={{ display: 'flex', flexDirection: 'row' }}>
+          <CardContent>
+            <Typography sx={{ mb: 7 }} onClick={() => navigate(`/taskview/${todo.toDoListID}`)} variant="h6">
+              {todo.title}
+            </Typography>
+          </CardContent>
+          <Tooltip title="Update">
+            <Button sx={{ width: '50px' }} color="success" onClick={() => handleEditDialogOpen(todo)}>
+              <EditIcon />
+            </Button>
+          </Tooltip>
+          <Tooltip title="Delete Task">
+            <Button sx={{ width: '50px' }} color="error" onClick={(event) => handleDeleteDialogOpen(todo)}>
+              <DeleteIcon />
+            </Button>
+          </Tooltip>
+        </Box>
+      ))}
     </Box>
   );
+  
   const authHeaders = () => {
     const token = localStorage.getItem('authToken');
     if (!token) {
