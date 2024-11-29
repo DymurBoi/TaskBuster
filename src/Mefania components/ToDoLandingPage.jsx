@@ -65,7 +65,7 @@ const ToDoListLanding = () => {
       <Divider sx={{ mb: 2 }} />
       {/* Existing To-Do Lists */}
       {todos.map((todo) => (
-        <Box xs={12} sm={6} md={4} key={todo.toDoListID} sx={{ display: 'flex', flexDirection: 'row' }}>
+        <Box key={todo.toDoListID} sx={{ display: 'flex', flexDirection: 'row',justifyContent: 'space-between' }}>
           <CardContent>
             <Typography sx={{ mb: 7 }} onClick={() => navigate(`/taskview/${todo.toDoListID}`)} variant="h6">
               {todo.title}
