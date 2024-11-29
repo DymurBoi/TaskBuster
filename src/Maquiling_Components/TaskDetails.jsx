@@ -18,7 +18,7 @@ import { Link } from 'react-router-dom';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ReplayIcon from '@mui/icons-material/Replay';
-import './task.css';
+
 
 const theme = createTheme({
   typography: {

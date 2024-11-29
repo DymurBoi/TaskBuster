@@ -7,7 +7,6 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import './task.css';
 import { ThemeProvider } from '@emotion/react';
 import { createTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid2';

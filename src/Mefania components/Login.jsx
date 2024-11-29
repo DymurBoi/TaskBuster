@@ -16,8 +16,7 @@ import FormControl from '@mui/material/FormControl';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import ChecklistIcon from '@mui/icons-material/Checklist';
-
-import './css.css';
+import Logo from "../assets/Logo1.png";
 
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState('');
@@ -83,55 +82,135 @@ const Login = ({ onLogin }) => {
 
   return (
     <div>
-     <nav className="navbar">
-      <Button
-          startIcon={<ChecklistIcon />}
-          sx={{width:'10%',ml:4,color:'white','& .MuiSvgIcon-root': { fontSize: 40 }}}
-          ><h1 className="navbar-logo">TaskBuster</h1>
-          </Button>
-        <div className="navbar-links">
-          <Link to="/" className="nav-link">
+      {/* Header */}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        bgcolor="#091057"
+        padding={2}
+        color="white"
+      >
+        <img src={Logo} alt="Logo" style={{ maxWidth: "60px" }} />
+        <Box display="flex" gap={3}>
+        <Link to="/">
+          <Typography
+            sx={{
+              color: "white",
+              fontFamily: "Poppins",
+              fontSize: "16px",
+              cursor: "pointer",
+              textDecoration: "none",
+              fontWeight: "bold",
+            }}
+          >
             Home
+          </Typography>
           </Link>
-          <Link to="/register" className="nav-link">
+          <Link to="/">
+          <Typography
+            sx={{
+              color: "white",
+              fontFamily: "Poppins",
+              fontSize: "16px",
+              cursor: "pointer",
+              textDecoration: "none",
+              fontWeight: "bold",
+            }}
+          >
             Register
+          </Typography>
           </Link>
-          <Link to="/login" className="nav-link">
+          <Link to="/login">
+          <Typography
+            sx={{
+              color: "white",
+              fontFamily: "Poppins",
+              fontSize: "16px",
+              cursor: "pointer",
+              textDecoration: "none",
+              fontWeight: "bold",
+            }}
+          >
             Login
+          </Typography>
           </Link>
-        </div>
-      </nav>
-
-      <div className="screen">
-        <Box sx={{ display: 'flex', flexDirection: 'row'}}>
-          <Box sx={{mr:25,mt:25}}>
-            <Typography variant='h2' sx={{fontWeight:'bold',color:'black'}}> TaskBuster</Typography>
-            <Typography variant='h5' sx={{color:'black'}}>Organize all your tasks easily</Typography>
-          </Box>
-        <div className="login-container">
-          <h2 className="header">Login</h2>
+        </Box>
+      </Box>
+      <Box display="flex" minHeight="100vh" width="100%">
+      {/* Left Side */}
+      <Box
+        flex={1}
+        bgcolor="#091057"
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <img src={Logo} alt="TaskBuster Logo" style={{ maxWidth: "500px", marginBottom: "20px" }} />
+        <Typography color="white" fontFamily="Poppins" textAlign="center">
+        </Typography>
+      </Box>
+      <Box
+        flex={1}
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        bgcolor="#F1F0E8"
+        padding={5}
+      >
+        <Box
+          width="100%"
+          maxWidth="400px"
+          bgcolor="white"
+          padding={4}
+          borderRadius="8px"
+          boxShadow={3}
+        >
+          <Typography
+            variant="h5"
+            fontFamily="Poppins"
+            fontWeight="bold"
+            textAlign="center"
+            marginBottom={3}
+            color="#091057"
+          >
+            Welcome to{" "}
+            <Typography component="span" color="#EC8305" variant="h3" fontWeight="bold">
+              <br />
+              TaskBuster
+            </Typography>
+          </Typography>
           <form onSubmit={handleLogin}>
-            <Box sx={{pr:6.5}}>
+            <Box>
             <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
               <InputLabel htmlFor="email">Email</InputLabel>
               <OutlinedInput
               id="email"
               type="email"
+              fullWidth
+              margin="normal"
+              label="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              label="Email"
-              sx={{ minWidth: 300 }}
+              variant="outlined"
+              sx={{ bgcolor: "#F5F5F5",width:300 }}
               required
               />
             </FormControl>
             <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
           <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
           <OutlinedInput
-            sx={{minWidth:300}}
             id="outlined-adornment-password"
+            fullWidth
+            margin="normal"
+            label="Password"
             value={password}
             onChange={handlePasswordChange}
             type={showPassword ? 'text' : 'password'}
+            variant="outlined"
+            sx={{ bgcolor: "#F5F5F5",width:300}}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
@@ -147,19 +226,29 @@ const Login = ({ onLogin }) => {
                 </IconButton>
               </InputAdornment>
             }
-            label="Password"
           />
         </FormControl>
             </Box>
-            {passwordError && <p className="error">{passwordError}</p>}
-            <Button type="submit" variant='contained' sx={{width:300,height:50,margin:2,bgcolor:'#B4BB85',color:'white','&:hover': { bgcolor:'#969c6e'}}}>
+            {passwordError && <Typography textAlign="center">{passwordError}</Typography>}
+            <Button
+             type="submit" 
+             fullWidth
+             variant="contained"
+             sx={{
+               backgroundColor: "#EC8305",
+               color: "white",
+               marginTop: 3,
+               fontWeight: "bold",
+               fontFamily: "Poppins",
+             }}>
               Login
             </Button>
           </form>
-        </div>
+          </Box>
+      </Box>
         </Box>
       </div>
-    </div>
+
   );
 };
 

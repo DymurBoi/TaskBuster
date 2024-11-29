@@ -6,7 +6,7 @@ import { createTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import { TextField, Button, Container, Box } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import './task.css'; // Adjust to your CSS file
+
 
 const theme = createTheme({
   typography: {
