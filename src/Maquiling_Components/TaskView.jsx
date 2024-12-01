@@ -7,32 +7,13 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { ThemeProvider } from '@emotion/react';
-import { createTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid2';
 import { styled } from '@mui/material/styles';
-import Paper from '@mui/material/Paper';
 import AddIcon from '@mui/icons-material/Add';
-import ChecklistIcon from '@mui/icons-material/Checklist';
-import { Container, IconButton, Menu, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import {Box, Container, IconButton, Menu, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import Logo from "../assets/Logo1.png"
 
-const theme = createTheme({
-  typography: {
-    fontFamily: `'Poppins', sans-serif`,
-    h2: {
-      color: 'black',
-      textAlign: 'center',  // Center the heading text
-    }
-  },
-});
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-}));
 
 function TaskView() {
   const { toDoListID } = useParams();
@@ -98,33 +79,112 @@ function TaskView() {
         setConfirm(false); // Close the dialog in case of an error
       });
   };
+
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('loggedInUserId');
     navigate('/login');
   }
-  return (
-    <div>
-      <ThemeProvider theme={theme}>
-      <nav className="navbar">
-          <Button
-          startIcon={<ChecklistIcon />}
-          sx={{width:'10%',ml:4,color:'white','& .MuiSvgIcon-root': { fontSize: 40 }}}
-          ><h1 className="navbar-logo">TaskBuster</h1>
-          </Button>
-          <div className="navbar-links">
-            <Link to="/todos" className="nav-link">Todos</Link>
-            <Link to="/profile" className="nav-link">Profile</Link>
-            <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
-          </div>
-        </nav>
-        <Container fixed sx={{ mb: 15 }}>
-          <Typography variant="h2" sx={{ mb: 2 }}>
-            Task List
-          </Typography>
 
-          {/* Filter Dropdown */}
-          <FormControl sx={{ minWidth: 200, mb: 2 }}>
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      {/* Header */}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        bgcolor="#091057"
+        padding={2}
+        color="white"
+      >
+         <Link to="/todos">
+         <Button sx={{ width: 'auto', mr: 1 }}><img src={Logo} alt="Logo" style={{ maxWidth: "60px" }} /></Button>
+        </Link>
+        
+        <Box display="flex" gap={3}>
+          <Link to="/todos">
+            <Typography
+              sx={{
+                color: "white",
+                fontFamily: "Poppins",
+                fontSize: "16px",
+                cursor: "pointer",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+            >
+              Home
+            </Typography>
+          </Link>
+          <Link to="/profile">
+            <Typography
+              sx={{
+                color: "white",
+                fontFamily: "Poppins",
+                fontSize: "16px",
+                cursor: "pointer",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+            >
+              Profile
+            </Typography>
+          </Link>
+          <Link to="/login">
+            <Typography
+              sx={{
+                color: "white",
+                fontFamily: "Poppins",
+                fontSize: "16px",
+                cursor: "pointer",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+              onClick={handleLogout}
+            >
+              Logout
+            </Typography>
+          </Link>
+        </Box>
+      </Box>
+
+      <Box flex="1" padding={4}>
+        <Box display="flex" alignItems="center" marginBottom={2}>
+          <IconButton onClick={() => navigate("/todos")}>
+            <ArrowBackIcon sx={{ color: "#091057" }} />
+          </IconButton>
+          <Typography
+            sx={{
+              fontFamily: "Poppins",
+              fontSize: "24px",
+              fontWeight: "bold",
+              marginLeft: 2,
+              color: "#091057",
+            }}
+          >
+            List
+          </Typography>
+          <Box display="flex" justifyContent="flex-end" sx={{ml:170}}>
+          <Link to="/createTask" state={{ toDoListId: toDoListID }}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              sx={{
+                backgroundColor: "#EC8305",
+                color: "white",
+                fontFamily: "Poppins",
+                textTransform: "none",
+              }}
+            >
+              Add Task
+            </Button>
+          </Link>
+        </Box>
+        </Box>
+
+        
+        <Box sx={{mb:2}}>
+          <FormControl sx={{ maxWidth: 200, display: 'flex', justifyContent: 'flex-start' }}>
             <InputLabel>Status</InputLabel>
             <Select
               value={filterStatus}
@@ -133,73 +193,89 @@ function TaskView() {
             >
               <MenuItem value="All">All</MenuItem>
               <MenuItem value="Pending">Pending</MenuItem>
+              <MenuItem value="Ongoing">Ongoing</MenuItem>
               <MenuItem value="Completed">Completed</MenuItem>
             </Select>
           </FormControl>
+          </Box>
+        <Box display="flex" flexWrap="wrap" gap={3} sx={{ textDecoration: 'none' }}>
+          {filteredTasks.map((task) => (
+            <Link to={`/taskdetails`} state={{ taskId: task.taskId }} 
+            onClick={(event) => event.stopPropagation()}
+            sx={{ textDecoration: 'none' }}>
+              <Box
+                key={task.id}
+                width="300px"
+                padding={2}
+                bgcolor="#F1F0E8"
+                borderRadius="8px"
+                boxShadow={2}
+                sx={{ cursor: "pointer" }}
+              >
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Typography
+                    variant="h6"
+                    fontFamily="Poppins"
+                    fontWeight="bold"
+                    color="#091057"
+                    sx={{ textDecoration: 'none' }}
+                  >
+                    {task.title}
+                  </Typography>
+                </Box>
+                <Typography
+                  color="#EC8305"
+                  fontFamily="Poppins"
+                  fontSize="14px"
+                  marginTop={1}
+                >
+                  {task.description}
+                </Typography>
+                <Typography
+                  color="#EC8305"
+                  fontFamily="Poppins"
+                  fontSize="14px"
+                  marginTop={1}
+                >
+                  {task.status}
+                </Typography>
+              </Box>
+            </Link>
+          ))}
+        </Box>
+      </Box>
 
-          <Grid container spacing={2} justifyContent="left">
-            {filteredTasks.map((task) => (
-              <Grid xs={10} sm={6} md={4} key={task.taskId}>
-                <Card
-                  sx={{
-                    minWidth: 275,
-                    minHeight: 278,
-                    maxWidth: 345,
-                    margin: '0 auto',
-                    cursor: 'pointer',
-                    '&:hover': { boxShadow: 6 },
-                    justifyContent: 'center',
-                  }}
-                >
-                  <CardContent sx={{ mb: 5 }}>
-                    <Typography variant="h5" component="div" sx={{ mb: 2 }}>
-                      {task.title}
-                    </Typography>
-                    <Typography sx={{ color: 'text.secondary', mb: 2 }}>
-                      Status: {task.status}
-                    </Typography>
-                    <Typography sx={{ color: 'text.secondary' }}>
-                      {task.tag ? task.tag.name : 'No Tag'}
-                    </Typography>
-                  </CardContent>
-                  <CardActions sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                    <Link to={`/taskdetails`} state={{ taskId: task.taskId }} onClick={(event) => event.stopPropagation()}>
-                      <Button variant="contained" size="small" sx={{ backgroundColor: '#fdcc01', alignContent: 'center', mr: 15 }}>
-                        View Details
-                      </Button>
-                    </Link>
-                  </CardActions>
-                </Card>
-              </Grid>
-            ))}
-            <Grid xs={12} md={6} lg={4}>
-              <Link to="/createTask" state={{ toDoListId: toDoListID }}>
-                <Card
-                  sx={{
-                    maxWidth: 340,
-                    margin: '0 auto',
-                    minWidth: 275,
-                    minHeight: 278,
-                    cursor: 'pointer',
-                    '&:hover': { boxShadow: 6 },
-                  }}
-                >
-                  <CardContent sx={{ '& .MuiSvgIcon-root': { fontSize: 60 } }}>
-                    <Typography variant="h5" component="div" sx={{ mb: 8 }}>
-                      Create Task
-                    </Typography>
-                    <IconButton sx={{ '&:hover': { backgroundColor: 'transparent' } }}>
-                      <AddIcon fontSize="large" />
-                    </IconButton>
-                  </CardContent>
-                </Card>
-              </Link>
-            </Grid>
-          </Grid>
-        </Container>
-      </ThemeProvider>
+      {/* Footer */}
+      <Box
+        bgcolor="#091057"
+        padding={3}
+        color="white"
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        marginTop="auto" // Pushes the footer to the bottom
+      >
+        <Box display="flex" gap={3} marginBottom={2}>
+          <Typography component="button">
+            <i className="fab fa-facebook" style={{ color: "white", fontSize: "20px" }}></i>
+          </Typography>
+          <Typography component="button">
+            <i className="fab fa-instagram" style={{ color: "white", fontSize: "20px" }}></i>
+          </Typography>
+          <Typography component="button">
+            <i className="fab fa-twitter" style={{ color: "white", fontSize: "20px" }}></i>
+          </Typography>
+        </Box>
+        <Box display="flex" gap={3} fontFamily="Poppins" fontSize="14px">
+          <Typography>Home</Typography>
+          <Typography>About</Typography>
+          <Typography>Team</Typography>
+          <Typography>Services</Typography>
+          <Typography>Contact</Typography>
+        </Box>
+      </Box>
     </div>
   );
-}
+};
 
 export default TaskView;

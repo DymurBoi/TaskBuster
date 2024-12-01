@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-import Button from '@mui/material/Button';
+import {Button,IconButton} from '@mui/material';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Dialog from '@mui/material/Dialog';
@@ -15,10 +15,10 @@ import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-
-import ChecklistIcon from '@mui/icons-material/Checklist';
+import ManImage from "../assets/man.jpg";
 import { Tooltip } from '@mui/material';
-
+import Logo from "../assets/Logo1.png";
+import AddIcon from "@mui/icons-material/Add";
 const API_BASE_URL = "http://localhost:8080/api/user";
 
 const ToDoListLanding = () => {
@@ -168,23 +168,183 @@ const ToDoListLanding = () => {
 
   return (
     <div>
-       <nav className="navbar">
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-       <Button onClick={toggleDrawer(true)} sx={{ width: 'auto', mr: 1 }}><ChecklistIcon sx={{color:'white','& .MuiSvgIcon-root': { fontSize: 100 }}} /></Button>
-      <Drawer open={open} onClose={toggleDrawer(false)}>
-        {DrawerList}
-      </Drawer>
+      {/* Header */}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        bgcolor="#091057"
+        padding={2}
+        color="white"
+      >
+        <Link to="/todos">
+         <Button sx={{ width: 'auto', mr: 1 }}><img src={Logo} alt="Logo" style={{ maxWidth: "60px" }} /></Button>
+        </Link>
+        <Box display="flex" gap={3}>
+          <Link to="/todos">
+            <Typography
+              sx={{
+                color: "white",
+                fontFamily: "Poppins",
+                fontSize: "16px",
+                cursor: "pointer",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+            >
+              Home
+            </Typography>
+          </Link>
+          <Link to="/profile">
+            <Typography
+              sx={{
+                color: "white",
+                fontFamily: "Poppins",
+                fontSize: "16px",
+                cursor: "pointer",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+            >
+              Profile
+            </Typography>
+          </Link>
+          <Link to="/login">
+            <Typography
+              sx={{
+                color: "white",
+                fontFamily: "Poppins",
+                fontSize: "16px",
+                cursor: "pointer",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+              onClick={handleLogout}
+            >
+              Logout
+            </Typography>
+          </Link>
+        </Box>
+      </Box>
+      <Box>
+        <img
+          src={ManImage}
+          alt="Man"
+          style={{ width: "100%", height: "450px", objectFit: "cover" }}
+        />
+      </Box>
+      <Box sx={{pl:4,pt:4,pr:2}}>
+        <Typography
+          variant="h4"
+          color="#091057"
+          fontFamily="Poppins"
+          fontWeight="bold"
+          marginBottom={1}
+        >
+          To-Do Lists
+        </Typography>
+        <Box display="flex" justifyContent="flex-end" marginBottom={2}>
           <Button
-          sx={{width:'10%',ml:0,color:'white','& .MuiSvgIcon-root': { fontSize: 40 }}}
-          ><h1 className="navbar-logo">TaskBuster</h1>
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => navigate('/todos/new')}
+            sx={{
+              backgroundColor: "#EC8305",
+              color: "white",
+              fontFamily: "Poppins",
+              textTransform: "none",
+            }}
+          >
+            Add List
           </Button>
+        </Box>
+      </Box>
+      <Box display="flex" flexWrap="wrap" gap={3} sx={{ml:4}}>
+      {todos.map((todo) => (
+        <Box
+        key={todo.toDoListID}
+        width="300px"
+        padding={2}
+        bgcolor="#F1F0E8"
+        borderRadius="8px"
+        boxShadow={2}
+        sx={{
+          cursor: "pointer",
+          "&:hover": {
+            boxShadow: 4,
+          },
+        }}
+        onClick={(e) => {
+          e.stopPropagation(); // Prevent navigation if DeleteIcon is clicked
+          navigate(`/taskview/${todo.toDoListID}`)
+        }}
+      >
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Typography
+                  variant="h6"
+                  fontFamily="Poppins"
+                  fontWeight="bold"
+                  color="#091057"
+                >
+                  {todo.title}
+                </Typography>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent navigation when removing
+                    handleDeleteDialogOpen(todo)
+                  }}
+                  
+                  sx={{ color: "#EC8305" }}
+                >
+                  <DeleteIcon />
+                </IconButton>
           </Box>
-          <div className="navbar-links">
-            <Link to="/todos" className="nav-link">Todos</Link>
-            <Link to="/profile" className="nav-link">Profile</Link>
-            <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
-          </div>
-        </nav>
+          <Box>
+                  <Typography
+                    color="#EC8305"
+                    fontFamily="Poppins"
+                    fontSize="14px"
+                  >
+                    {todo.description}
+                  </Typography>
+              </Box>
+          </Box>
+      ))}
+      </Box>
+      <Box
+        bgcolor="#091057"
+        padding={3}
+        color="white"
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        marginTop={4}
+      >
+        {/* Social Media Icons */}
+        <Box display="flex" gap={3} marginBottom={2}>
+          <Typography component="button">
+            <i className="fab fa-facebook" style={{ color: "white", fontSize: "20px" }}></i>
+          </Typography>
+          <Typography component="button">
+            <i className="fab fa-instagram" style={{ color: "white", fontSize: "20px" }}></i>
+          </Typography>
+          <Typography component="button">
+            <i className="fab fa-twitter" style={{ color: "white", fontSize: "20px" }}></i>
+          </Typography>
+        </Box>
+        <Box display="flex" gap={3} fontFamily="Poppins" fontSize="14px">
+          <Typography>Home</Typography>
+          <Typography>About</Typography>
+          <Typography>Team</Typography>
+          <Typography>Services</Typography>
+          <Typography>Contact</Typography>
+        </Box>
+      </Box>
+
+
+
+
       {/* Update Dialog */}
       <Dialog open={editing} onClose={() => setEditing(false)}>
         <DialogTitle>Update To-Do</DialogTitle>
