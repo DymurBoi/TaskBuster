@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-import {Button,IconButton} from '@mui/material';
+import {Button,IconButton,TextField} from '@mui/material';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Dialog from '@mui/material/Dialog';
@@ -288,6 +288,8 @@ const ToDoListLanding = () => {
                 >
                   {todo.title}
                 </Typography>
+                <Box>
+                <Tooltip title="Delete">
                 <IconButton
                   size="small"
                   onClick={(e) => {
@@ -299,6 +301,7 @@ const ToDoListLanding = () => {
                 >
                   <DeleteIcon />
                 </IconButton>
+                </Tooltip>
                 <Tooltip title="Update">
             <IconButton 
               size="small"
@@ -308,6 +311,7 @@ const ToDoListLanding = () => {
               <EditIcon />
             </IconButton>
           </Tooltip>
+                </Box>  
           </Box>
           <Box>
                   <Typography
@@ -358,23 +362,27 @@ const ToDoListLanding = () => {
       <Dialog open={editing} onClose={() => setEditing(false)}>
         <DialogTitle>Update To-Do</DialogTitle>
         <DialogContent>
-          <label>
-            Title:
-            <input
-              type="text"
-              value={editFormData.title}
-              onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
-              className="input"
-            />
-          </label>
-          <label>
-            Description:
-            <textarea
-              value={editFormData.description}
-              onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-              className="input"
-            />
-          </label>
+        <TextField
+            label="Title"
+            type="text"
+            value={editFormData.title}
+            onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
+            variant="outlined"
+            placeholder="Title"
+            sx={{ backgroundColor: "#F5F5F5", borderRadius: "8px",mt:1 }}
+          />
+        <TextField
+            label="Description"
+            type="text"
+            value={editFormData.description}
+            onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+            variant="outlined"
+            fullWidth
+            multiline
+            rows={4}
+            placeholder="Write your comment here..."
+            sx={{ backgroundColor: "#F5F5F5", borderRadius: "8px",mt:2 }}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleUpdate} color="primary">Save</Button>
