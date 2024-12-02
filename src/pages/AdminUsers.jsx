@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Box, Button, Container, Typography, TextField } from '@mui/material';
-import ChecklistIcon from '@mui/icons-material/Checklist';
+import { Box, Button, Typography, TextField } from '@mui/material';
+import Logo from "../assets/Logo1.png";
 import axios from 'axios';
 
 const AdminUsers = ({ admin, setAdmin, setIsLoggedIn }) => {
@@ -57,127 +57,181 @@ const AdminUsers = ({ admin, setAdmin, setIsLoggedIn }) => {
 
   return (
     <div>
-      <nav className="navbar">
-        <Button
-          startIcon={<ChecklistIcon />}
+      {/* Navbar */}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        bgcolor="#091057"
+        padding={2}
+        color="white"
+      >
+        <img src={Logo} alt="Logo" style={{ maxWidth: "60px" }} />
+        <Box display="flex" gap={3}>
+          <Link to="/admin/dashboard">
+            <Typography
+              sx={{
+                color: "white",
+                fontFamily: "Poppins",
+                fontSize: "16px",
+                cursor: "pointer",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+            >
+              Dashboard
+            </Typography>
+          </Link>
+          <Link to="/admin/profile">
+            <Typography
+              sx={{
+                color: "white",
+                fontFamily: "Poppins",
+                fontSize: "16px",
+                cursor: "pointer",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+            >
+              Profile
+            </Typography>
+          </Link>
+          <Typography
+            variant="outlined"
+            sx={{
+              color: "white",
+              borderColor: "white",
+              fontWeight: "bold",
+            }}
+            onClick={handleLogout}
+          >
+            Logout
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* Main Content */}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center', // Horizontally centers the content
+          alignItems: 'center', // Vertically centers the content
+ // Makes sure the content takes up the full height of the viewport
+          padding: 2,
+          m:6
+        }}
+      >
+        <Box
           sx={{
-            width: '10%',
-            ml: 4,
-            color: 'white',
-            '& .MuiSvgIcon-root': { fontSize: 40 },
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '90%', // Take up more horizontal space
+            maxWidth: '1200px', // Increase the max width to make it bigger
+            padding: 4,
+            bgcolor: 'white',
+            borderRadius: 2,
+            boxShadow: 5,
           }}
         >
-          <h1 className="navbar-logo">TaskBuster</h1>
-        </Button>
-        <Box sx={{ display: 'flex', flexDirection: 'row', gap: 3, pb: 0, pt: 2,pr:2 }}>
-          <Link to="/admin/dashboard" className="nav-link">Home</Link>
-          <Link to="/admin/profile" className="nav-link">Profile</Link>
-          <Button
-            onClick={handleLogout}
+          <Typography variant="h3" fontWeight="bold" sx={{ color: 'black', marginBottom: 3 }}>
+            Manage Users
+          </Typography>
+
+          {error && <Typography color="error" variant="body2">{error}</Typography>}
+
+          {/* Search Bar */}
+          <TextField
+            type="text"
+            placeholder="Search users..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             sx={{
-              padding: 0,
-              pb: 3,
-              color: 'white',
-              fontFamily: 'Poppins, sans-serif',
-              fontWeight: 'bold',
-              textTransform: 'none',
-              fontSize: 16,
+              width: '100%',
+              marginBottom: 3,
+              marginTop: 2,
             }}
+            variant="outlined"
+          />
+
+          {/* Create User Button */}
+          <Button
+            variant="contained"
+            sx={{
+              width: '100%',
+              backgroundColor: 'primary',
+              color: 'white',
+              fontWeight: 'bold',
+              marginBottom: 3,
+              height: '50px', // Consistent button height
+            }}
+            onClick={() => navigate('/admin/create-user')}
           >
-            Log Out
+            Create User
           </Button>
+
+          {/* Users Table */}
+          <Box sx={{ width: '100%', overflowX: 'auto' }}>
+            <table
+              style={{
+                width: '100%',
+                tableLayout: 'fixed',
+                borderCollapse: 'collapse',
+                marginBottom: 2,
+              }}
+            >
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Date Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.map((user) => (
+                  <tr key={user.userId}>
+                    <td>{user.userId}</td>
+                    <td>{user.name}</td>
+                    <td>{user.email}</td>
+                    <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                    <td style={{ display: 'flex', gap: '10px' }}>
+                      {/* Edit Button */}
+                      <Button
+                        variant="contained"
+                        sx={{
+                          marginRight: 1,
+                          color: 'white',
+                          width: '120px', // Consistent width for buttons
+                          height: '50px', // Consistent height for buttons
+                        }}
+                        onClick={() => navigate(`/admin/users/${user.userId}`)}
+                      >
+                        Edit
+                      </Button>
+
+                      {/* Delete Button */}
+                      <Button
+                        variant="contained"
+                        color="error"
+                        sx={{
+                          width: '120px', // Consistent width for buttons
+                          height: '50px', // Consistent height for buttons
+                        }}
+                        onClick={() => handleDeleteUser(user.userId)}
+                      >
+                        Delete
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Box>
         </Box>
-      </nav>
-      <Container
-  component="main"
-  maxWidth="xl"
-  sx={{
-    display: 'flex',
-    justifyContent: 'center',
-    marginTop: 8,
-    paddiing:0// Optional: adjust padding as needed
-  }}
->
-  <div className="users-container">
-    <Typography variant="h3" sx={{ color: 'black', fontFamily: 'Poppins, sans-serif' }}>
-      Manage Users
-    </Typography>
-    {error && <p className="error-message">{error}</p>}
-
-    {/* Search Bar */}
-    <TextField
-      type="text"
-      placeholder="Search users..."
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      className="search-bar"
-    />
-
-    {/* Create User Button */}
-    <button
-      className="create-user-btn"
-      onClick={() => navigate('/admin/create-user')}
-      style={{ backgroundColor: '#fdcc01' }}
-    >
-      Create User
-    </button>
-
-    {/* Users Table */}
-    <table
-      style={{
-        width: '100%', // Set the table width to 100% of the parent container
-        tableLayout: 'fixed', // Optional: ensures columns are evenly distributed
-        borderCollapse: 'collapse', // Optional: for cleaner borders
-      }}
-    >
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Date Created</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {filteredUsers.map((user) => (
-          <tr key={user.userId}>
-            <td>
-              <Typography sx={{ color: 'black', fontFamily: 'Poppins, sans-serif' }}>
-                {user.userId}
-              </Typography>
-            </td>
-            <td>
-              <Typography sx={{ color: 'black', fontFamily: 'Poppins, sans-serif' }}>
-                {user.name}
-              </Typography>
-            </td>
-            <td>
-              <Typography sx={{ color: 'black', fontFamily: 'Poppins, sans-serif' }}>
-                {user.email}
-              </Typography>
-            </td>
-            <td>
-              <Typography sx={{ color: 'black', fontFamily: 'Poppins, sans-serif' }}>
-                {user.createdAt}
-              </Typography>
-            </td>
-            <td>
-              <button onClick={() => navigate(`/admin/users/${user.userId}`)}>Edit</button>
-              <button
-                style={{ backgroundColor: 'red', color: 'white' }}
-                onClick={() => handleDeleteUser(user.userId)}
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-</Container>
-
+      </Box>
     </div>
   );
 };

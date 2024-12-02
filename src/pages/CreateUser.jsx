@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,Link } from 'react-router-dom';
 import axios from 'axios';
 import { Box, Button, Container, Typography, OutlinedInput, IconButton, Paper, InputAdornment } from '@mui/material';
-import ChecklistIcon from '@mui/icons-material/Checklist';
+import Logo from "../assets/Logo1.png";
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
@@ -25,37 +25,69 @@ const CreateUser = ({ admin, setAdmin, setIsLoggedIn }) => {
       setError('Failed to create user.');
     }
   };
-
+  const handleLogout = () => {
+    localStorage.removeItem('admin');
+    setAdmin(null);
+    setIsLoggedIn(false);
+    navigate('/');
+  };
   // Toggle password visibility
   const handleClickShowPassword = () => setShowPassword((prev) => !prev);
   const handleMouseDownPassword = (event) => event.preventDefault();
 
   return (
     <div>
-      <nav className="navbar">
-        <Button
-          startIcon={<ChecklistIcon />}
-          sx={{
-            width: '10%',
-            ml: 4,
-            color: 'white',
-            '& .MuiSvgIcon-root': { fontSize: 40 },
-          }}
-        >
-          <h1 className="navbar-logo">TaskBuster</h1>
-        </Button>
-        <div className="navbar-links">
-          <Button onClick={() => navigate('/admin/dashboard')} sx={{ color: 'white', fontFamily: 'Poppins, sans-serif', fontWeight: 'bold', textTransform: 'none', fontSize: 16 }}>
-            Dashboard
-          </Button>
-          <Button onClick={() => navigate('/admin/users')} sx={{ color: 'white', fontFamily: 'Poppins, sans-serif', fontWeight: 'bold', textTransform: 'none', fontSize: 16 }}>
-            Users
-          </Button>
-          <Button onClick={() => navigate('/')} sx={{ color: 'white', fontFamily: 'Poppins, sans-serif', fontWeight: 'bold', textTransform: 'none', fontSize: 16 }}>
-            Log Out
-          </Button>
-        </div>
-      </nav>
+       <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        bgcolor="#091057"
+        padding={2}
+        color="white"
+      >
+        <img src={Logo} alt="Logo" style={{ maxWidth: "60px" }} />
+        <Box display="flex" gap={3}>
+          <Link to="/admin/dashboard">
+            <Typography
+              sx={{
+                color: "white",
+                fontFamily: "Poppins",
+                fontSize: "16px",
+                cursor: "pointer",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+            >
+              Dashboard
+            </Typography>
+          </Link>
+          <Link to="/admin/profile">
+            <Typography
+              sx={{
+                color: "white",
+                fontFamily: "Poppins",
+                fontSize: "16px",
+                cursor: "pointer",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+            >
+              Profile
+            </Typography>
+          </Link>
+          <Typography
+            variant="outlined"
+            sx={{
+              color: "white",
+              borderColor: "white",
+              fontWeight: "bold",
+            }}
+            onClick={handleLogout}
+          >
+            Logout
+          </Typography>
+        </Box>
+      </Box>
 
       <Container component="main" maxWidth="xs" sx={{ display: 'flex', justifyContent: 'center', marginTop: 8 }}>
         <Paper elevation={3} sx={{ padding: 3, width: '100%' }}>
@@ -116,7 +148,7 @@ const CreateUser = ({ admin, setAdmin, setIsLoggedIn }) => {
                 type="submit"
                 variant="contained"
                 color="primary"
-                sx={{ width: '100%', bgcolor: '#fdcc01', color: 'black' }}
+                sx={{ width: '100%', bgcolor: 'primary', color: 'white' }}
               >
                 Create User
               </Button>
