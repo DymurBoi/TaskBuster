@@ -25,54 +25,19 @@ const ToDoListLanding = () => {
   const [todos, setTodos] = useState([]);
   const [selectedTodo, setSelectedTodo] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isAddingTodo, setIsAddingTodo] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editFormData, setEditFormData] = useState({ title: '', description: '' });
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  
   const navigate = useNavigate();
 
   const token = localStorage.getItem('authToken');
   const userId = localStorage.getItem('loggedInUserId');
+  const [id,setId]=useState(userId)
   const [open, setOpen] = React.useState(false);
 
-  const toggleDrawer = (newOpen) => () => {
-    setOpen(newOpen);
-  };
-
-  const DrawerList = (
-    <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
-      {/* Add New To-Do Button */}
-      <Box sx={{ p: 2 }}>
-        <Button
-          variant="outlined"
-          sx={{width:200,bgcolor:'#B4BB85',color:'white','&:hover': { bgcolor:'#969c6e'}}}
-          fullWidth
-          onClick={() => navigate('/todos/new')}
-        >
-         + Add New To-Do
-        </Button>
-      </Box>
-      <Divider sx={{ mb: 2 }} />
-      {/* Existing To-Do Lists */}
-      {todos.map((todo) => (
-        <Box key={todo.toDoListID} sx={{ display: 'flex', flexDirection: 'row',justifyContent: 'space-between' }}>
-          <CardContent>
-            <Typography sx={{ mb: 7 }} onClick={() => navigate(`/taskview/${todo.toDoListID}`)} variant="h6">
-              {todo.title}
-            </Typography>
-          </CardContent>
-          <Tooltip title="Update">
-            <Button sx={{ width: '50px' }} color="success" onClick={() => handleEditDialogOpen(todo)}>
-              <EditIcon />
-            </Button>
-          </Tooltip>
-          <Tooltip title="Delete Task">
-            <Button sx={{ width: '50px' }} color="error" onClick={(event) => handleDeleteDialogOpen(todo)}>
-              <DeleteIcon />
-            </Button>
-          </Tooltip>
-        </Box>
-      ))}
-    </Box>
-  );
   
   const authHeaders = () => {
     const token = localStorage.getItem('authToken');
@@ -106,6 +71,34 @@ const ToDoListLanding = () => {
 
     fetchToDos();
   }, [token, userId]);
+
+  const handleAddTodo = async () => {
+    if (!title || !description) {
+        alert("Please fill in both title and description!");
+        return;
+    }
+
+    const newToDo = {
+        title: title,
+        description: description,
+        user: { userId: userId }, // Assuming the userId is set correctly
+    };
+
+    try {
+        const response = await axios.post(
+            `${API_BASE_URL}/createT`,
+            newToDo,
+            authHeaders()
+        );
+        // After the to-do is created, add it to the local todos state
+        setTodos([...todos, response.data]);
+        setTitle('');
+        setDescription('');
+        setIsAddingTodo(false);  // Close the dialog
+    } catch (error) {
+        console.error("Failed to create new to-do:", error);
+    }
+};
 
 
   const handleDelete = async (id) => {
@@ -247,7 +240,7 @@ const ToDoListLanding = () => {
           <Button
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={() => navigate('/todos/new')}
+            onClick={() => setIsAddingTodo(true)}
             sx={{
               backgroundColor: "#EC8305",
               color: "white",
@@ -405,6 +398,50 @@ const ToDoListLanding = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      
+      <Dialog open={isAddingTodo} onClose={() => setIsAddingTodo(false)}>
+    <DialogTitle>Add To-Do</DialogTitle>
+    <DialogContent>
+        <TextField
+            id="title"
+            label="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            variant="outlined"
+            placeholder="Title of the List"
+            required
+            sx={{ backgroundColor: "#F5F5F5", borderRadius: "8px" }}
+        />
+        <TextField
+            id="description"
+            label="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            variant="outlined"
+            placeholder="Description"
+            required
+            multiline
+            rows={4}
+            fullWidth
+            sx={{ backgroundColor: "#F5F5F5", borderRadius: "8px",mt:2 }}
+        />
+    </DialogContent>
+    <DialogActions>
+        <Button
+            variant="contained"
+            onClick={handleAddTodo} // Call handleAddTodo on submit
+            sx={{
+                backgroundColor: "#EC8305",
+                color: "white",
+                fontFamily: "Poppins",
+                textTransform: "none",
+            }}
+        >
+            Add Todo List
+        </Button>
+    </DialogActions>
+</Dialog>
+
     </div>
   );
 };

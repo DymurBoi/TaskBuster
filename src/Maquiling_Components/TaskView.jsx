@@ -11,21 +11,28 @@ import Grid from '@mui/material/Grid2';
 import { styled } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import {Box, Container, IconButton, Menu, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
-import Logo from "../assets/Logo1.png"
-
+import { Box, Container, IconButton, Menu, MenuItem, Select, InputLabel, FormControl, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import Logo from "../assets/Logo1.png";
 
 function TaskView() {
   const { toDoListID } = useParams();
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
-  const [filterStatus, setFilterStatus] = useState('All'); // Filter status state
-  const [confirm, setConfirm] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
+  const [filterStatus, setFilterStatus] = useState('All');
+  const [openAddDialog, setOpenAddDialog] = useState(false);
+  const [newTask, setNewTask] = useState({
+    title: '',
+    description: '',
+    status: 'Pending',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    dueDate: '',  // Newly added dueDate
+    tag: { tagId: '' },
+    toDoList: { toDoListID: toDoListID },
+  });
   const navigate = useNavigate();
   const token = localStorage.getItem('authToken');
 
-  // Fetch tasks when component mounts or when toDoListID or token changes
   useEffect(() => {
     const fetchTasks = async () => {
       if (!token) {
@@ -46,7 +53,6 @@ function TaskView() {
     fetchTasks();
   }, [token, toDoListID]);
 
-  // Filter tasks based on the selected status
   useEffect(() => {
     if (filterStatus === 'All') {
       setFilteredTasks(tasks);
@@ -55,93 +61,94 @@ function TaskView() {
     }
   }, [tasks, filterStatus]);
 
-  // Set the selected task and open the confirmation dialog
-  const confirmButton = (id) => {
-    setSelectedTask(id);
-    setConfirm(true);
+  const handleAddTaskClick = () => {
+    setOpenAddDialog(true);
   };
 
-  // Delete the selected task from the server
-  const deleteTask = (taskId) => {
-    if (!taskId) return;
-
-    axios
-      .delete(`http://localhost:8080/api/taskbuster/deleteTask/${taskId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(() => {
-        // Remove the task from the state after successful deletion
-        setTasks((prevTasks) => prevTasks.filter((task) => task.taskId !== taskId));
-        setConfirm(false); // Close the confirmation dialog
-      })
-      .catch((error) => {
-        console.error('Error deleting task:', error);
-        setConfirm(false); // Close the dialog in case of an error
-      });
+  const handleCloseDialog = () => {
+    setOpenAddDialog(false);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('loggedInUserId');
-    navigate('/login');
-  }
+  const postTag = (priority) => {
+    const newTag = {
+      name: priority,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    axios.post('/api/taskbuster/postTag', newTag)
+      .then(response => {
+        setNewTask(prevTask => ({
+          ...prevTask,
+          tag: { tagId: response.data.tagId },
+        }));
+      })
+      .catch(error => console.error("Error posting tag:", error));
+  };
+
+  const postTask = (task) => {
+    axios.post('/api/taskbuster/postTask', task)
+      .then(response => {
+        const newTask = response.data;
+        setTasks(prevTasks => [...prevTasks, newTask]);
+        setNewTask({
+          title: '',
+          description: '',
+          status: 'Pending',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          dueDate: '',
+          tag: { tagId: '' },
+          toDoList: { toDoListID: toDoListID },
+        });
+      })
+      .catch(error => console.error("Error posting task:", error));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    postTask(newTask);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "todoListId") {
+      setNewTask(prevTask => ({
+        ...prevTask,
+        toDoList: { ...prevTask.toDoList, toDoListID: value },
+      }));
+    } else {
+      setNewTask(prevTask => ({
+        ...prevTask,
+        [name]: value,
+      }));
+    }
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       {/* Header */}
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        bgcolor="#091057"
-        padding={2}
-        color="white"
-      >
-         <Link to="/todos">
-         <Button sx={{ width: 'auto', mr: 1 }}><img src={Logo} alt="Logo" style={{ maxWidth: "60px" }} /></Button>
+      <Box display="flex" justifyContent="space-between" alignItems="center" bgcolor="#091057" padding={2} color="white">
+        <Link to="/todos">
+          <Button sx={{ width: 'auto', mr: 1 }}><img src={Logo} alt="Logo" style={{ maxWidth: "60px" }} /></Button>
         </Link>
-        
         <Box display="flex" gap={3}>
           <Link to="/todos">
-            <Typography
-              sx={{
-                color: "white",
-                fontFamily: "Poppins",
-                fontSize: "16px",
-                cursor: "pointer",
-                textDecoration: "none",
-                fontWeight: "bold",
-              }}
-            >
+            <Typography sx={{ color: "white", fontFamily: "Poppins", fontSize: "16px", cursor: "pointer", textDecoration: "none", fontWeight: "bold" }}>
               Home
             </Typography>
           </Link>
           <Link to="/profile">
-            <Typography
-              sx={{
-                color: "white",
-                fontFamily: "Poppins",
-                fontSize: "16px",
-                cursor: "pointer",
-                textDecoration: "none",
-                fontWeight: "bold",
-              }}
-            >
+            <Typography sx={{ color: "white", fontFamily: "Poppins", fontSize: "16px", cursor: "pointer", textDecoration: "none", fontWeight: "bold" }}>
               Profile
             </Typography>
           </Link>
           <Link to="/login">
-            <Typography
-              sx={{
-                color: "white",
-                fontFamily: "Poppins",
-                fontSize: "16px",
-                cursor: "pointer",
-                textDecoration: "none",
-                fontWeight: "bold",
-              }}
-              onClick={handleLogout}
-            >
+            <Typography sx={{ color: "white", fontFamily: "Poppins", fontSize: "16px", cursor: "pointer", textDecoration: "none", fontWeight: "bold" }} onClick={() => {
+              localStorage.removeItem('authToken');
+              localStorage.removeItem('loggedInUserId');
+              navigate('/login');
+            }}>
               Logout
             </Typography>
           </Link>
@@ -153,19 +160,10 @@ function TaskView() {
           <IconButton onClick={() => navigate("/todos")}>
             <ArrowBackIcon sx={{ color: "#091057" }} />
           </IconButton>
-          <Typography
-            sx={{
-              fontFamily: "Poppins",
-              fontSize: "24px",
-              fontWeight: "bold",
-              marginLeft: 2,
-              color: "#091057",
-            }}
-          >
+          <Typography sx={{ fontFamily: "Poppins", fontSize: "24px", fontWeight: "bold", marginLeft: 2, color: "#091057" }}>
             List
           </Typography>
-          <Box display="flex" justifyContent="flex-end" sx={{ml:170}}>
-          <Link to="/createTask" state={{ toDoListId: toDoListID }}>
+          <Box display="flex" justifyContent="flex-end" sx={{ ml: 170 }}>
             <Button
               variant="contained"
               startIcon={<AddIcon />}
@@ -175,15 +173,15 @@ function TaskView() {
                 fontFamily: "Poppins",
                 textTransform: "none",
               }}
+              onClick={handleAddTaskClick}
             >
               Add Task
             </Button>
-          </Link>
-        </Box>
+          </Box>
         </Box>
 
-        
-        <Box sx={{mb:2}}>
+        {/* Task Filter */}
+        <Box sx={{ mb: 2 }}>
           <FormControl sx={{ maxWidth: 200, display: 'flex', justifyContent: 'flex-start' }}>
             <InputLabel>Status</InputLabel>
             <Select
@@ -197,46 +195,22 @@ function TaskView() {
               <MenuItem value="Completed">Completed</MenuItem>
             </Select>
           </FormControl>
-          </Box>
+        </Box>
+
+        {/* Task List */}
         <Box display="flex" flexWrap="wrap" gap={3} sx={{ textDecoration: 'none' }}>
           {filteredTasks.map((task) => (
-            <Link to={`/taskdetails`} state={{ taskId: task.taskId }} 
-            onClick={(event) => event.stopPropagation()}
-            sx={{ textDecoration: 'none' }}>
-              <Box
-                key={task.id}
-                width="300px"
-                padding={2}
-                bgcolor="#F1F0E8"
-                borderRadius="8px"
-                boxShadow={2}
-                sx={{ cursor: "pointer" }}
-              >
+            <Link to={`/taskdetails`} state={{ taskId: task.taskId }} onClick={(event) => event.stopPropagation()} sx={{ textDecoration: 'none' }}>
+              <Box key={task.id} width="300px" padding={2} bgcolor="#F1F0E8" borderRadius="8px" boxShadow={2} sx={{ cursor: "pointer" }}>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography
-                    variant="h6"
-                    fontFamily="Poppins"
-                    fontWeight="bold"
-                    color="#091057"
-                    sx={{ textDecoration: 'none' }}
-                  >
+                  <Typography variant="h6" fontFamily="Poppins" fontWeight="bold" color="#091057" sx={{ textDecoration: 'none' }}>
                     {task.title}
                   </Typography>
                 </Box>
-                <Typography
-                  color="#EC8305"
-                  fontFamily="Poppins"
-                  fontSize="14px"
-                  marginTop={1}
-                >
+                <Typography color="#EC8305" fontFamily="Poppins" fontSize="14px" marginTop={1}>
                   {task.description}
                 </Typography>
-                <Typography
-                  color="#EC8305"
-                  fontFamily="Poppins"
-                  fontSize="14px"
-                  marginTop={1}
-                >
+                <Typography color="#EC8305" fontFamily="Poppins" fontSize="14px" marginTop={1}>
                   {task.status}
                 </Typography>
               </Box>
@@ -245,7 +219,67 @@ function TaskView() {
         </Box>
       </Box>
 
-      {/* Footer */}
+      {/* Add Task Dialog */}
+      <Dialog open={openAddDialog} onClose={handleCloseDialog}>
+        <form onSubmit={handleSubmit}>
+          <DialogTitle>Add New Task</DialogTitle>
+          <DialogContent>
+            <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 2, gap: 2 }}>
+              <Button onClick={() => postTag("Low Priority")} variant="contained" sx={{ bgcolor: "primary", color: "white" }}>Low Priority</Button>
+              <Button onClick={() => postTag("High Priority")} variant="contained" sx={{ bgcolor: "primary", color: "white" }}>High Priority</Button>
+              <Button onClick={() => postTag("Urgent")} variant="contained" sx={{ bgcolor: "primary", color: "white" }}>Urgent</Button>
+            </Box>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Task Title"
+              fullWidth
+              variant="outlined"
+              value={newTask.title}
+              onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+            />
+            <TextField
+              margin="dense"
+              label="Task Description"
+              fullWidth
+              variant="outlined"
+              value={newTask.description}
+              onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+            />
+            <FormControl fullWidth margin="dense">
+              <InputLabel>Status</InputLabel>
+              <Select
+                value={newTask.status}
+                onChange={(e) => setNewTask({ ...newTask, status: e.target.value })}
+                label="Status"
+              >
+                <MenuItem value="Pending">Pending</MenuItem>
+                <MenuItem value="Ongoing">Ongoing</MenuItem>
+                <MenuItem value="Completed">Completed</MenuItem>
+              </Select>
+            </FormControl>
+
+            <TextField
+                  label="Due Date"
+                  name="dueDate"
+                  type="datetime-local"
+                  variant="outlined"
+                  value={newTask.dueDate}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Cancel</Button>
+            <Button type='submit'>Add Task</Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+
       <Box
         bgcolor="#091057"
         padding={3}
@@ -253,7 +287,7 @@ function TaskView() {
         display="flex"
         flexDirection="column"
         alignItems="center"
-        marginTop="auto" // Pushes the footer to the bottom
+        marginTop="auto"
       >
         <Box display="flex" gap={3} marginBottom={2}>
           <Typography component="button">
@@ -276,6 +310,6 @@ function TaskView() {
       </Box>
     </div>
   );
-};
+}
 
 export default TaskView;
