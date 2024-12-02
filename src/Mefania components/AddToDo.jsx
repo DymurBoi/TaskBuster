@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { Box, FormControl, InputLabel, OutlinedInput, Paper, Button, Container } from '@mui/material';
 import ChecklistIcon from '@mui/icons-material/Checklist';
-import './css.css';
+
 
 const API_BASE_URL = "http://localhost:8080/api/user";
 
@@ -106,7 +106,7 @@ const AddToDo = () => {
           <Button 
             onClick={handleAddToDo}
             variant="contained" 
-            sx={{ marginTop: 2, padding: '10px 20px', bgcolor: '#fdcc01', color: 'black' }}
+            sx={{width:500,bgcolor:'#B4BB85',color:'white','&:hover': { bgcolor:'#969c6e'}}}
           >
             Add To-Do
           </Button>

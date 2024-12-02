@@ -2,9 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
+import {Button,IconButton,TextField} from '@mui/material';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Dialog from '@mui/material/Dialog';
@@ -12,23 +10,35 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import Grid from '@mui/material/Grid2';
-import './css.css';
-import ChecklistIcon from '@mui/icons-material/Checklist';
-
+import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
+import Divider from '@mui/material/Divider';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import ManImage from "../assets/man.jpg";
+import { Tooltip } from '@mui/material';
+import Logo from "../assets/Logo1.png";
+import AddIcon from "@mui/icons-material/Add";
 const API_BASE_URL = "http://localhost:8080/api/user";
 
 const ToDoListLanding = () => {
   const [todos, setTodos] = useState([]);
   const [selectedTodo, setSelectedTodo] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isAddingTodo, setIsAddingTodo] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editFormData, setEditFormData] = useState({ title: '', description: '' });
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  
   const navigate = useNavigate();
 
   const token = localStorage.getItem('authToken');
   const userId = localStorage.getItem('loggedInUserId');
+  const [id,setId]=useState(userId)
+  const [open, setOpen] = React.useState(false);
 
+  
   const authHeaders = () => {
     const token = localStorage.getItem('authToken');
     if (!token) {
@@ -61,6 +71,34 @@ const ToDoListLanding = () => {
 
     fetchToDos();
   }, [token, userId]);
+
+  const handleAddTodo = async () => {
+    if (!title || !description) {
+        alert("Please fill in both title and description!");
+        return;
+    }
+
+    const newToDo = {
+        title: title,
+        description: description,
+        user: { userId: userId }, // Assuming the userId is set correctly
+    };
+
+    try {
+        const response = await axios.post(
+            `${API_BASE_URL}/createT`,
+            newToDo,
+            authHeaders()
+        );
+        // After the to-do is created, add it to the local todos state
+        setTodos([...todos, response.data]);
+        setTitle('');
+        setDescription('');
+        setIsAddingTodo(false);  // Close the dialog
+    } catch (error) {
+        console.error("Failed to create new to-do:", error);
+    }
+};
 
 
   const handleDelete = async (id) => {
@@ -123,90 +161,221 @@ const ToDoListLanding = () => {
 
   return (
     <div>
-       <nav className="navbar">
+      {/* Header */}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        bgcolor="#091057"
+        padding={2}
+        color="white"
+      >
+        <Link to="/todos">
+         <Button sx={{ width: 'auto', mr: 1 }}><img src={Logo} alt="Logo" style={{ maxWidth: "60px" }} /></Button>
+        </Link>
+        <Box display="flex" gap={3}>
+          <Link to="/todos">
+            <Typography
+              sx={{
+                color: "white",
+                fontFamily: "Poppins",
+                fontSize: "16px",
+                cursor: "pointer",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+            >
+              Home
+            </Typography>
+          </Link>
+          <Link to="/profile">
+            <Typography
+              sx={{
+                color: "white",
+                fontFamily: "Poppins",
+                fontSize: "16px",
+                cursor: "pointer",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+            >
+              Profile
+            </Typography>
+          </Link>
+          <Link to="/login">
+            <Typography
+              sx={{
+                color: "white",
+                fontFamily: "Poppins",
+                fontSize: "16px",
+                cursor: "pointer",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+              onClick={handleLogout}
+            >
+              Logout
+            </Typography>
+          </Link>
+        </Box>
+      </Box>
+      <Box>
+        <img
+          src={ManImage}
+          alt="Man"
+          style={{ width: "100%", height: "450px", objectFit: "cover" }}
+        />
+      </Box>
+      <Box sx={{pl:4,pt:4,pr:2}}>
+        <Typography
+          variant="h4"
+          color="#091057"
+          fontFamily="Poppins"
+          fontWeight="bold"
+          marginBottom={1}
+        >
+          To-Do Lists
+        </Typography>
+        <Box display="flex" justifyContent="flex-end" marginBottom={2}>
           <Button
-          startIcon={<ChecklistIcon />}
-          sx={{width:'10%',ml:4,color:'white','& .MuiSvgIcon-root': { fontSize: 40 }}}
-          ><h1 className="navbar-logo">TaskBuster</h1>
-          </Button>
-          <div className="navbar-links">
-            <Link to="/todos" className="nav-link">Todos</Link>
-            <Link to="/profile" className="nav-link">Profile</Link>
-            <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
-          </div>
-        </nav>
-
-      <Typography variant="h2" sx={{ marginBottom: '2em', textAlign: 'center' }}>
-        Your To-Do List
-      </Typography>
-
-      <Grid container spacing={3} justifyContent="center">
-        {todos.map((todo) => (
-          <Grid xs={12} sm={6} md={4} key={todo.toDoListID}>
-            <Card sx={{ minWidth: 275,
-                    minHeight: 278,
-                    maxHeight: 278,
-                    maxWidth: 345,
-                    padding:2,
-                    pb:0,
-                    margin: '0 auto',
-                    cursor: 'pointer',
-                    '&:hover': { boxShadow: 6 },
-                    justifyContent: 'center',}}>
-              <CardContent>
-                <Typography sx={{mb:7}} onClick={() => navigate(`/taskview/${todo.toDoListID}`)}variant="h5">{todo.title}</Typography>
-                <Typography variant="body2">{todo.description}</Typography>
-              </CardContent>
-              <CardActions sx={{mt:3,padding:2}}>
-                <Button variant="contained" size="small" onClick={() => handleEditDialogOpen(todo)}>Update</Button>
-                <Button variant="contained" size="small" color="error" onClick={() => handleDeleteDialogOpen(todo)}>Delete</Button>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
-        <Grid xs={12} sm={6} md={4}>
-          <Card
-           sx={{ minWidth: 275,
-            minHeight: 278,
-            maxHeight: 278,
-            maxWidth: 345,
-            padding:2,
-            pb:0,
-            margin: '0 auto',
-            cursor: 'pointer',
-            '&:hover': { boxShadow: 6 },
-            justifyContent: 'center',}}
-            onClick={() => navigate('/todos/new')}
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setIsAddingTodo(true)}
+            sx={{
+              backgroundColor: "#EC8305",
+              color: "white",
+              fontFamily: "Poppins",
+              textTransform: "none",
+            }}
           >
-            <CardContent>
-              <Typography variant="h5">Add New To-Do</Typography>
-              <Typography variant="h1" align="center">+</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+            Add List
+          </Button>
+        </Box>
+      </Box>
+      <Box display="flex" flexWrap="wrap" gap={3} sx={{ml:4}}>
+      {todos.map((todo) => (
+        <Box
+        key={todo.toDoListID}
+        width="300px"
+        padding={2}
+        bgcolor="#F1F0E8"
+        borderRadius="8px"
+        boxShadow={2}
+        sx={{
+          cursor: "pointer",
+          "&:hover": {
+            boxShadow: 4,
+          },
+        }}
+        onClick={(e) => {
+          e.stopPropagation(); // Prevent navigation if DeleteIcon is clicked
+          navigate(`/taskview/${todo.toDoListID}`)
+        }}
+      >
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Typography
+                  variant="h6"
+                  fontFamily="Poppins"
+                  fontWeight="bold"
+                  color="#091057"
+                >
+                  {todo.title}
+                </Typography>
+                <Box>
+                <Tooltip title="Delete">
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent navigation when removing
+                    handleDeleteDialogOpen(todo)
+                  }}
+                  
+                  sx={{ color: "#EC8305" }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+                </Tooltip>
+                <Tooltip title="Update">
+            <IconButton 
+              size="small"
+              color="primary" 
+              onClick={(e) => {e.stopPropagation();
+              handleEditDialogOpen(todo)}}>
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+                </Box>  
+          </Box>
+          <Box>
+                  <Typography
+                    color="#EC8305"
+                    fontFamily="Poppins"
+                    fontSize="14px"
+                  >
+                    {todo.description}
+                  </Typography>
+              </Box>
+          </Box>
+      ))}
+      </Box>
+      <Box
+        bgcolor="#091057"
+        padding={3}
+        color="white"
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        marginTop={4}
+      >
+        {/* Social Media Icons */}
+        <Box display="flex" gap={3} marginBottom={2}>
+          <Typography component="button">
+            <i className="fab fa-facebook" style={{ color: "white", fontSize: "20px" }}></i>
+          </Typography>
+          <Typography component="button">
+            <i className="fab fa-instagram" style={{ color: "white", fontSize: "20px" }}></i>
+          </Typography>
+          <Typography component="button">
+            <i className="fab fa-twitter" style={{ color: "white", fontSize: "20px" }}></i>
+          </Typography>
+        </Box>
+        <Box display="flex" gap={3} fontFamily="Poppins" fontSize="14px">
+          <Typography>Home</Typography>
+          <Typography>About</Typography>
+          <Typography>Team</Typography>
+          <Typography>Services</Typography>
+          <Typography>Contact</Typography>
+        </Box>
+      </Box>
+
+
+
 
       {/* Update Dialog */}
       <Dialog open={editing} onClose={() => setEditing(false)}>
         <DialogTitle>Update To-Do</DialogTitle>
         <DialogContent>
-          <label>
-            Title:
-            <input
-              type="text"
-              value={editFormData.title}
-              onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
-              className="input"
-            />
-          </label>
-          <label>
-            Description:
-            <textarea
-              value={editFormData.description}
-              onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-              className="input"
-            />
-          </label>
+        <TextField
+            label="Title"
+            type="text"
+            value={editFormData.title}
+            onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
+            variant="outlined"
+            placeholder="Title"
+            sx={{ backgroundColor: "#F5F5F5", borderRadius: "8px",mt:1 }}
+          />
+        <TextField
+            label="Description"
+            type="text"
+            value={editFormData.description}
+            onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+            variant="outlined"
+            fullWidth
+            multiline
+            rows={4}
+            placeholder="Write your comment here..."
+            sx={{ backgroundColor: "#F5F5F5", borderRadius: "8px",mt:2 }}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleUpdate} color="primary">Save</Button>
@@ -229,6 +398,50 @@ const ToDoListLanding = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      
+      <Dialog open={isAddingTodo} onClose={() => setIsAddingTodo(false)}>
+    <DialogTitle>Add To-Do</DialogTitle>
+    <DialogContent>
+        <TextField
+            id="title"
+            label="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            variant="outlined"
+            placeholder="Title of the List"
+            required
+            sx={{ backgroundColor: "#F5F5F5", borderRadius: "8px" }}
+        />
+        <TextField
+            id="description"
+            label="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            variant="outlined"
+            placeholder="Description"
+            required
+            multiline
+            rows={4}
+            fullWidth
+            sx={{ backgroundColor: "#F5F5F5", borderRadius: "8px",mt:2 }}
+        />
+    </DialogContent>
+    <DialogActions>
+        <Button
+            variant="contained"
+            onClick={handleAddTodo} // Call handleAddTodo on submit
+            sx={{
+                backgroundColor: "#EC8305",
+                color: "white",
+                fontFamily: "Poppins",
+                textTransform: "none",
+            }}
+        >
+            Add Todo List
+        </Button>
+    </DialogActions>
+</Dialog>
+
     </div>
   );
 };

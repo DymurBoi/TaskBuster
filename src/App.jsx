@@ -9,7 +9,6 @@ import AdminUsers from './pages/AdminUsers';
 import EditUser from './pages/EditUser';
 import CreateUser from './pages/CreateUser';
 import ProtectedRoute from './components/ProtectedRoute'; // Import ProtectedRoute
-import './styles.css';
 const App = () => {
   const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);

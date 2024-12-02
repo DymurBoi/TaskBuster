@@ -7,45 +7,32 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import './task.css';
-import { ThemeProvider } from '@emotion/react';
-import { createTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid2';
 import { styled } from '@mui/material/styles';
-import Paper from '@mui/material/Paper';
 import AddIcon from '@mui/icons-material/Add';
-import ChecklistIcon from '@mui/icons-material/Checklist';
-import { Container, IconButton, Menu, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
-
-const theme = createTheme({
-  typography: {
-    fontFamily: `'Poppins', sans-serif`,
-    h2: {
-      color: 'black',
-      textAlign: 'center',  // Center the heading text
-    }
-  },
-});
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-}));
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { Box, Container, IconButton, Menu, MenuItem, Select, InputLabel, FormControl, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import Logo from "../assets/Logo1.png";
 
 function TaskView() {
   const { toDoListID } = useParams();
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
-  const [filterStatus, setFilterStatus] = useState('All'); // Filter status state
-  const [confirm, setConfirm] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
+  const [filterStatus, setFilterStatus] = useState('All');
+  const [openAddDialog, setOpenAddDialog] = useState(false);
+  const [newTask, setNewTask] = useState({
+    title: '',
+    description: '',
+    status: 'Pending',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    dueDate: '',  // Newly added dueDate
+    tag: { tagId: '' },
+    toDoList: { toDoListID: toDoListID },
+  });
   const navigate = useNavigate();
   const token = localStorage.getItem('authToken');
 
-  // Fetch tasks when component mounts or when toDoListID or token changes
   useEffect(() => {
     const fetchTasks = async () => {
       if (!token) {
@@ -66,7 +53,6 @@ function TaskView() {
     fetchTasks();
   }, [token, toDoListID]);
 
-  // Filter tasks based on the selected status
   useEffect(() => {
     if (filterStatus === 'All') {
       setFilteredTasks(tasks);
@@ -75,57 +61,128 @@ function TaskView() {
     }
   }, [tasks, filterStatus]);
 
-  // Set the selected task and open the confirmation dialog
-  const confirmButton = (id) => {
-    setSelectedTask(id);
-    setConfirm(true);
+  const handleAddTaskClick = () => {
+    setOpenAddDialog(true);
   };
 
-  // Delete the selected task from the server
-  const deleteTask = (taskId) => {
-    if (!taskId) return;
-
-    axios
-      .delete(`http://localhost:8080/api/taskbuster/deleteTask/${taskId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(() => {
-        // Remove the task from the state after successful deletion
-        setTasks((prevTasks) => prevTasks.filter((task) => task.taskId !== taskId));
-        setConfirm(false); // Close the confirmation dialog
-      })
-      .catch((error) => {
-        console.error('Error deleting task:', error);
-        setConfirm(false); // Close the dialog in case of an error
-      });
+  const handleCloseDialog = () => {
+    setOpenAddDialog(false);
   };
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('loggedInUserId');
-    navigate('/login');
-  }
+
+  const postTag = (priority) => {
+    const newTag = {
+      name: priority,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    axios.post('/api/taskbuster/postTag', newTag)
+      .then(response => {
+        setNewTask(prevTask => ({
+          ...prevTask,
+          tag: { tagId: response.data.tagId },
+        }));
+      })
+      .catch(error => console.error("Error posting tag:", error));
+  };
+
+  const postTask = (task) => {
+    axios.post('/api/taskbuster/postTask', task)
+      .then(response => {
+        const newTask = response.data;
+        setTasks(prevTasks => [...prevTasks, newTask]);
+        setNewTask({
+          title: '',
+          description: '',
+          status: 'Pending',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          dueDate: '',
+          tag: { tagId: '' },
+          toDoList: { toDoListID: toDoListID },
+        });
+      })
+      .catch(error => console.error("Error posting task:", error));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    postTask(newTask);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "todoListId") {
+      setNewTask(prevTask => ({
+        ...prevTask,
+        toDoList: { ...prevTask.toDoList, toDoListID: value },
+      }));
+    } else {
+      setNewTask(prevTask => ({
+        ...prevTask,
+        [name]: value,
+      }));
+    }
+  };
+
   return (
-    <div>
-      <ThemeProvider theme={theme}>
-      <nav className="navbar">
-          <Button
-          startIcon={<ChecklistIcon />}
-          sx={{width:'10%',ml:4,color:'white','& .MuiSvgIcon-root': { fontSize: 40 }}}
-          ><h1 className="navbar-logo">TaskBuster</h1>
-          </Button>
-          <div className="navbar-links">
-            <Link to="/todos" className="nav-link">Todos</Link>
-            <Link to="/profile" className="nav-link">Profile</Link>
-            <span onClick={handleLogout} className="nav-link logout-text">Logout</span>
-          </div>
-        </nav>
-        <Container fixed sx={{ mb: 15 }}>
-          <Typography variant="h2" sx={{ mb: 2 }}>
-            Task List
-          </Typography>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      {/* Header */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" bgcolor="#091057" padding={2} color="white">
+        <Link to="/todos">
+          <Button sx={{ width: 'auto', mr: 1 }}><img src={Logo} alt="Logo" style={{ maxWidth: "60px" }} /></Button>
+        </Link>
+        <Box display="flex" gap={3}>
+          <Link to="/todos">
+            <Typography sx={{ color: "white", fontFamily: "Poppins", fontSize: "16px", cursor: "pointer", textDecoration: "none", fontWeight: "bold" }}>
+              Home
+            </Typography>
+          </Link>
+          <Link to="/profile">
+            <Typography sx={{ color: "white", fontFamily: "Poppins", fontSize: "16px", cursor: "pointer", textDecoration: "none", fontWeight: "bold" }}>
+              Profile
+            </Typography>
+          </Link>
+          <Link to="/login">
+            <Typography sx={{ color: "white", fontFamily: "Poppins", fontSize: "16px", cursor: "pointer", textDecoration: "none", fontWeight: "bold" }} onClick={() => {
+              localStorage.removeItem('authToken');
+              localStorage.removeItem('loggedInUserId');
+              navigate('/login');
+            }}>
+              Logout
+            </Typography>
+          </Link>
+        </Box>
+      </Box>
 
-          {/* Filter Dropdown */}
-          <FormControl sx={{ minWidth: 200, mb: 2 }}>
+      <Box flex="1" padding={4}>
+        <Box display="flex" alignItems="center" marginBottom={2}>
+          <IconButton onClick={() => navigate("/todos")}>
+            <ArrowBackIcon sx={{ color: "#091057" }} />
+          </IconButton>
+          <Typography sx={{ fontFamily: "Poppins", fontSize: "24px", fontWeight: "bold", marginLeft: 2, color: "#091057" }}>
+            List
+          </Typography>
+          <Box display="flex" justifyContent="flex-end" sx={{ ml: 170 }}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              sx={{
+                backgroundColor: "#EC8305",
+                color: "white",
+                fontFamily: "Poppins",
+                textTransform: "none",
+              }}
+              onClick={handleAddTaskClick}
+            >
+              Add Task
+            </Button>
+          </Box>
+        </Box>
+
+        {/* Task Filter */}
+        <Box sx={{ mb: 2 }}>
+          <FormControl sx={{ maxWidth: 200, display: 'flex', justifyContent: 'flex-start' }}>
             <InputLabel>Status</InputLabel>
             <Select
               value={filterStatus}
@@ -134,71 +191,123 @@ function TaskView() {
             >
               <MenuItem value="All">All</MenuItem>
               <MenuItem value="Pending">Pending</MenuItem>
+              <MenuItem value="Ongoing">Ongoing</MenuItem>
               <MenuItem value="Completed">Completed</MenuItem>
             </Select>
           </FormControl>
+        </Box>
 
-          <Grid container spacing={2} justifyContent="left">
-            {filteredTasks.map((task) => (
-              <Grid xs={10} sm={6} md={4} key={task.taskId}>
-                <Card
-                  sx={{
-                    minWidth: 275,
-                    minHeight: 278,
-                    maxWidth: 345,
-                    margin: '0 auto',
-                    cursor: 'pointer',
-                    '&:hover': { boxShadow: 6 },
-                    justifyContent: 'center',
+        {/* Task List */}
+        <Box display="flex" flexWrap="wrap" gap={3} sx={{ textDecoration: 'none' }}>
+          {filteredTasks.map((task) => (
+            <Link to={`/taskdetails`} state={{ taskId: task.taskId }} onClick={(event) => event.stopPropagation()} sx={{ textDecoration: 'none' }}>
+              <Box key={task.id} width="300px" padding={2} bgcolor="#F1F0E8" borderRadius="8px" boxShadow={2} sx={{ cursor: "pointer" }}>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Typography variant="h6" fontFamily="Poppins" fontWeight="bold" color="#091057" sx={{ textDecoration: 'none' }}>
+                    {task.title}
+                  </Typography>
+                </Box>
+                <Typography color="#EC8305" fontFamily="Poppins" fontSize="14px" marginTop={1}>
+                  {task.description}
+                </Typography>
+                <Typography color="#EC8305" fontFamily="Poppins" fontSize="14px" marginTop={1}>
+                  {task.status}
+                </Typography>
+              </Box>
+            </Link>
+          ))}
+        </Box>
+      </Box>
+
+      {/* Add Task Dialog */}
+      <Dialog open={openAddDialog} onClose={handleCloseDialog}>
+        <form onSubmit={handleSubmit}>
+          <DialogTitle>Add New Task</DialogTitle>
+          <DialogContent>
+            <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 2, gap: 2 }}>
+              <Button onClick={() => postTag("Low Priority")} variant="contained" sx={{ bgcolor: "primary", color: "white" }}>Low Priority</Button>
+              <Button onClick={() => postTag("High Priority")} variant="contained" sx={{ bgcolor: "primary", color: "white" }}>High Priority</Button>
+              <Button onClick={() => postTag("Urgent")} variant="contained" sx={{ bgcolor: "primary", color: "white" }}>Urgent</Button>
+            </Box>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Task Title"
+              fullWidth
+              variant="outlined"
+              value={newTask.title}
+              onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+            />
+            <TextField
+              margin="dense"
+              label="Task Description"
+              fullWidth
+              variant="outlined"
+              value={newTask.description}
+              onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+            />
+            <FormControl fullWidth margin="dense">
+              <InputLabel>Status</InputLabel>
+              <Select
+                value={newTask.status}
+                onChange={(e) => setNewTask({ ...newTask, status: e.target.value })}
+                label="Status"
+              >
+                <MenuItem value="Pending">Pending</MenuItem>
+                <MenuItem value="Ongoing">Ongoing</MenuItem>
+                <MenuItem value="Completed">Completed</MenuItem>
+              </Select>
+            </FormControl>
+
+            <TextField
+                  label="Due Date"
+                  name="dueDate"
+                  type="datetime-local"
+                  variant="outlined"
+                  value={newTask.dueDate}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    shrink: true,
                   }}
-                >
-                  <CardContent sx={{ mb: 5 }}>
-                    <Typography variant="h5" component="div" sx={{ mb: 2 }}>
-                      {task.title}
-                    </Typography>
-                    <Typography sx={{ color: 'text.secondary', mb: 2 }}>
-                      Status: {task.status}
-                    </Typography>
-                    <Typography sx={{ color: 'text.secondary' }}>
-                      {task.tag ? task.tag.name : 'No Tag'}
-                    </Typography>
-                  </CardContent>
-                  <CardActions sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                    <Link to={`/taskdetails`} state={{ taskId: task.taskId }} onClick={(event) => event.stopPropagation()}>
-                      <Button variant="contained" size="small" sx={{ backgroundColor: '#fdcc01', alignContent: 'center', mr: 15 }}>
-                        View Details
-                      </Button>
-                    </Link>
-                  </CardActions>
-                </Card>
-              </Grid>
-            ))}
-            <Grid xs={12} md={6} lg={4}>
-              <Link to="/createTask" state={{ toDoListId: toDoListID }}>
-                <Card
-                  sx={{
-                    maxWidth: 340,
-                    margin: '0 auto',
-                    minWidth: 275,
-                    minHeight: 278,
-                    cursor: 'pointer',
-                    '&:hover': { boxShadow: 6 },
-                  }}
-                >
-                  <CardContent sx={{ '& .MuiSvgIcon-root': { fontSize: 60 } }}>
-                    <Typography variant="h5" component="div" sx={{ mb: 8 }}>
-                      Create Task
-                    </Typography>
-                    <IconButton sx={{ '&:hover': { backgroundColor: 'transparent' } }}>
-                      <AddIcon fontSize="large" />
-                    </IconButton>
-                  </CardContent>
-                </Card>
-              </Link>
-            </Grid>
-          </Grid>
-        </Container>
-      </ThemeProvider>
+                />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Cancel</Button>
+            <Button type='submit'>Add Task</Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+
+      <Box
+        bgcolor="#091057"
+        padding={3}
+        color="white"
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        marginTop="auto"
+      >
+        <Box display="flex" gap={3} marginBottom={2}>
+          <Typography component="button">
+            <i className="fab fa-facebook" style={{ color: "white", fontSize: "20px" }}></i>
+          </Typography>
+          <Typography component="button">
+            <i className="fab fa-instagram" style={{ color: "white", fontSize: "20px" }}></i>
+          </Typography>
+          <Typography component="button">
+            <i className="fab fa-twitter" style={{ color: "white", fontSize: "20px" }}></i>
+          </Typography>
+        </Box>
+        <Box display="flex" gap={3} fontFamily="Poppins" fontSize="14px">
+          <Typography>Home</Typography>
+          <Typography>About</Typography>
+          <Typography>Team</Typography>
+          <Typography>Services</Typography>
+          <Typography>Contact</Typography>
+        </Box>
+      </Box>
     </div>
   );
 }

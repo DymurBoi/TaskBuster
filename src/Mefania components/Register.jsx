@@ -2,10 +2,11 @@
 import React, { useState } from 'react';
 import { createUser } from '../api';
 import { useNavigate, Link } from 'react-router-dom';
-import { Box, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, Paper } from '@mui/material';
+import { Box, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, Paper, Typography } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import Button from '@mui/material/Button';
+import Logo from "../assets/Logo1.png";
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
@@ -64,29 +65,104 @@ const Register = () => {
 
   return (
     <div>
-      <nav className="navbar">
-      <Button
-          startIcon={<ChecklistIcon />}
-          sx={{width:'10%',ml:4,color:'white','& .MuiSvgIcon-root': { fontSize: 40 }}}
-          ><h1 className="navbar-logo">TaskBuster</h1>
-          </Button>
-        <div className="navbar-links">
-          <Link to="/" className="nav-link">
+       {/* Header */}
+       <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        bgcolor="#091057"
+        padding={2}
+        color="white"
+      >
+        <img src={Logo} alt="Logo" style={{ maxWidth: "60px" }} />
+        <Box display="flex" gap={3}>
+        <Link to="/">
+          <Typography
+            sx={{
+              color: "white",
+              fontFamily: "Poppins",
+              fontSize: "16px",
+              cursor: "pointer",
+              textDecoration: "none",
+              fontWeight: "bold",
+            }}
+          >
             Home
+          </Typography>
           </Link>
-          <Link to="/register" className="nav-link">
+          <Link to="/">
+          <Typography
+            sx={{
+              color: "white",
+              fontFamily: "Poppins",
+              fontSize: "16px",
+              cursor: "pointer",
+              textDecoration: "none",
+              fontWeight: "bold",
+            }}
+          >
             Register
+          </Typography>
           </Link>
-          <Link to="/login" className="nav-link">
+          <Link to="/login">
+          <Typography
+            sx={{
+              color: "white",
+              fontFamily: "Poppins",
+              fontSize: "16px",
+              cursor: "pointer",
+              textDecoration: "none",
+              fontWeight: "bold",
+            }}
+          >
             Login
+          </Typography>
           </Link>
-        </div>
-      </nav>
-      <div className="screen">
-        <Paper elevation={3} className="register-container"> {/* Paper component with elevation */}
-          <h2 className="header">Register</h2>
+        </Box>
+      </Box>
+      <Box display="flex" minHeight="100vh" width="100%">
+       
+      <Box
+        flex={1}
+        bgcolor="#091057"
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <img src={Logo} alt="TaskBuster Logo" style={{ maxWidth: "500px", marginBottom: "20px" }} />
+        <Typography color="white" fontFamily="Poppins" textAlign="center">
+        </Typography>
+      </Box>
+
+      <Box
+        flex={1}
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        bgcolor="#F1F0E8"
+        padding={5}
+      >
+        <Box
+          width="100%"
+          maxWidth="400px"
+          bgcolor="white"
+          padding={4}
+          borderRadius="8px"
+          boxShadow={3}
+        >
+          <Typography
+            variant="h4"
+            fontFamily="Poppins"
+            fontWeight="bold"
+            textAlign="center"
+            color="#091057"
+            marginBottom={3}
+          >
+            Register
+          </Typography>
           <form onSubmit={handleSubmit}>
-            <Box sx={{ pr: 6 }}>
               {/* Name Field */}
               <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
                 <InputLabel htmlFor="name">Name</InputLabel>
@@ -142,12 +218,24 @@ const Register = () => {
                   sx={{ minWidth: 300 }}
                 />
               </FormControl>
-            </Box>
-            {passwordError && <p className="error">{passwordError}</p>}
-            <button type="submit" className="button">Register</button>
+              {passwordError && <Typography textAlign="center">{passwordError}</Typography>}
+            <Button
+             type="submit" 
+             fullWidth
+             variant="contained"
+             sx={{
+               backgroundColor: "#EC8305",
+               color: "white",
+               marginTop: 3,
+               fontWeight: "bold",
+               fontFamily: "Poppins",
+             }}>
+              Register
+            </Button>
           </form>
-        </Paper>
-      </div>
+        </Box>
+      </Box>
+      </Box> 
     </div>
   );
 };
