@@ -299,6 +299,15 @@ const ToDoListLanding = () => {
                 >
                   <DeleteIcon />
                 </IconButton>
+                <Tooltip title="Update">
+            <IconButton 
+              size="small"
+              color="primary" 
+              onClick={(e) => {e.stopPropagation();
+              handleEditDialogOpen(todo)}}>
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
           </Box>
           <Box>
                   <Typography
